@@ -5,12 +5,9 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"os/signal"
 	"path/filepath"
-	"syscall"
 	"time"
 
-	"github.com/creack/pty"
 	"github.com/paramientos/leap/internal/config"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
@@ -44,6 +41,17 @@ func Connect(conn config.Connection, record bool) error {
 }
 
 func connectWithSystemSSH(conn config.Connection, recording io.Writer) error {
+	args := buildSSHArgs(conn)
+	cmd := exec.Command("ssh", args...)
+
+	if recording != nil {
+		return connectWithSystemSSHRecording(cmd, recording)
+	}
+
+	return connectWithSystemSSHNormal(conn)
+}
+
+func buildSSHArgs(conn config.Connection) []string {
 	args := []string{}
 
 	if conn.IdentityFile != "" {
@@ -56,42 +64,7 @@ func connectWithSystemSSH(conn config.Connection, recording io.Writer) error {
 	target := fmt.Sprintf("%s@%s", conn.User, conn.Host)
 	args = append(args, target)
 
-	cmd := exec.Command("ssh", args...)
-
-	if recording != nil {
-		ptmx, err := pty.Start(cmd)
-		if err != nil {
-			return err
-		}
-		defer ptmx.Close()
-
-		ch := make(chan os.Signal, 1)
-		signal.Notify(ch, syscall.SIGWINCH)
-		go func() {
-			for range ch {
-				if err := pty.InheritSize(os.Stdin, ptmx); err != nil {
-					fmt.Printf("error resizing pty: %s", err)
-				}
-			}
-		}()
-		ch <- syscall.SIGWINCH
-
-		oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
-		if err != nil {
-			panic(err)
-		}
-		defer term.Restore(int(os.Stdin.Fd()), oldState)
-
-		multi := io.MultiWriter(os.Stdout, recording)
-		go func() { io.Copy(ptmx, os.Stdin) }()
-		io.Copy(multi, ptmx)
-		return nil
-	}
-
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	return args
 }
 
 func connectWithPassword(conn config.Connection, recording io.Writer) error {
