@@ -13,13 +13,27 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "leap",
-	Short: "SSH Connection Manager",
-	Long:  `A CLI tool to manage your SSH connections with tags, fuzzy search, and more.`,
-	Args:  cobra.ArbitraryArgs,
+	Short: "⚡ LEAP - Modern SSH Connection Manager",
+	Long: `
+⚡ LEAP SSH MANAGER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A modern CLI tool to manage your SSH connections with tags, 
+fuzzy search, and an intuitive terminal interface.
+
+Features:
+  • 🔐 Secure encrypted configuration
+  • 🏷️  Tag-based organization
+  • 🔍 Fuzzy search & filtering
+  • 🎨 Beautiful terminal UI
+  • 🔀 Jump host support
+  • 🚇 SSH tunnel management
+`,
+	Args: cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg, err := config.LoadConfig(GetPassphrase())
 		if err != nil {
-			fmt.Printf("Error loading config: %v\n", err)
+			fmt.Printf("\n❌ Error loading config: %v\n\n", err)
 			return
 		}
 
@@ -27,6 +41,7 @@ var rootCmd = &cobra.Command{
 			// Check if it's a connection name
 			name := strings.Join(args, " ")
 			if conn, ok := cfg.Connections[name]; ok {
+				fmt.Printf("\n🚀 Connecting to \033[1;36m%s\033[0m...\n\n", name)
 				ssh.Connect(conn)
 				return
 			}
@@ -34,11 +49,13 @@ var rootCmd = &cobra.Command{
 			// Try partial match or tag match
 			for _, conn := range cfg.Connections {
 				if strings.Contains(strings.ToLower(conn.Name), strings.ToLower(name)) {
+					fmt.Printf("\n🚀 Connecting to \033[1;36m%s\033[0m...\n\n", conn.Name)
 					ssh.Connect(conn)
 					return
 				}
 				for _, tag := range conn.Tags {
 					if strings.EqualFold(tag, name) {
+						fmt.Printf("\n🚀 Connecting to \033[1;36m%s\033[0m...\n\n", conn.Name)
 						ssh.Connect(conn)
 						return
 					}
@@ -49,14 +66,14 @@ var rootCmd = &cobra.Command{
 		// Run TUI
 		choice, err := tui.Run(cfg)
 		if err != nil {
-			fmt.Printf("Error running TUI: %v\n", err)
+			fmt.Printf("\n❌ Error running TUI: %v\n\n", err)
 			return
 		}
 
 		if choice != nil {
 			err = ssh.Connect(*choice)
 			if err != nil {
-				fmt.Printf("SSH Connection closed with error: %v\n", err)
+				fmt.Printf("\n❌ SSH Connection closed with error: %v\n\n", err)
 			}
 		}
 	},

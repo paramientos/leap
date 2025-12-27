@@ -21,6 +21,10 @@ type Connection struct {
 	JumpHost     string    `yaml:"jump_host,omitempty"`
 	Tunnels      []Tunnel  `yaml:"tunnels,omitempty"`
 	LastUsed     time.Time `yaml:"last_used,omitempty"`
+	Favorite     bool      `yaml:"favorite,omitempty"`
+	Notes        string    `yaml:"notes,omitempty"`
+	UsageCount   int       `yaml:"usage_count,omitempty"`
+	CreatedAt    time.Time `yaml:"created_at,omitempty"`
 }
 
 type Tunnel struct {
@@ -93,4 +97,38 @@ func SaveConfig(cfg *Config, passphrase string) error {
 	}
 
 	return os.WriteFile(path, data, 0600)
+}
+
+func (cfg *Config) UpdateLastUsed(name string) {
+	if conn, ok := cfg.Connections[name]; ok {
+		conn.LastUsed = time.Now()
+		conn.UsageCount++
+		cfg.Connections[name] = conn
+	}
+}
+
+func (cfg *Config) DeleteConnection(name string) bool {
+	if _, ok := cfg.Connections[name]; ok {
+		delete(cfg.Connections, name)
+		return true
+	}
+	return false
+}
+
+func (cfg *Config) ToggleFavorite(name string) bool {
+	if conn, ok := cfg.Connections[name]; ok {
+		conn.Favorite = !conn.Favorite
+		cfg.Connections[name] = conn
+		return conn.Favorite
+	}
+	return false
+}
+
+func (cfg *Config) SetNotes(name, notes string) bool {
+	if conn, ok := cfg.Connections[name]; ok {
+		conn.Notes = notes
+		cfg.Connections[name] = conn
+		return true
+	}
+	return false
 }

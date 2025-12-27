@@ -11,31 +11,84 @@ import (
 )
 
 var (
-	appStyle = lipgloss.NewStyle().Padding(1, 2)
+	// Laravel-inspired color palette
+	laravelRed     = lipgloss.Color("#FF2D20")
+	laravelOrange  = lipgloss.Color("#FF6B35")
+	primaryGreen   = lipgloss.Color("#10B981")
+	accentCyan     = lipgloss.Color("#06B6D4")
+	darkBg         = lipgloss.Color("#1F2937")
+	lightText      = lipgloss.Color("#F9FAFB")
+	mutedText      = lipgloss.Color("#9CA3AF")
+	borderColor    = lipgloss.Color("#374151")
+	highlightColor = lipgloss.Color("#3B82F6")
 
-	titleStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#FFFDF5")).
-			Background(lipgloss.Color("#7D56F4")).
-			Padding(0, 1).
-			Bold(true)
+	// Main app container
+	appStyle = lipgloss.NewStyle().
+			Padding(1, 2).
+			Background(lipgloss.Color("#111827"))
 
+	// Header with gradient effect (simulated)
+	headerStyle = lipgloss.NewStyle().
+			Foreground(lightText).
+			Background(primaryGreen).
+			Padding(0, 2).
+			Bold(true).
+			MarginBottom(1)
+
+	// Subtitle style
+	subtitleStyle = lipgloss.NewStyle().
+			Foreground(mutedText).
+			Italic(true).
+			MarginBottom(1)
+
+	// Detail panel with modern styling
 	detailStyle = lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("#7D56F4")).
-			Padding(1, 2).
-			MarginLeft(2)
+			BorderForeground(borderColor).
+			Padding(2, 3).
+			MarginLeft(2).
+			Background(darkBg)
 
+	// Label style for detail fields
+	labelStyle = lipgloss.NewStyle().
+			Foreground(accentCyan).
+			Bold(true).
+			Width(12)
+
+	// Value style for detail fields
+	valueStyle = lipgloss.NewStyle().
+			Foreground(lightText)
+
+	// Tag with modern pill design
 	tagStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#FFFDF5")).
-			Background(lipgloss.Color("#00BFFF")).
-			Padding(0, 1).
+			Foreground(darkBg).
+			Background(accentCyan).
+			Padding(0, 2).
 			MarginRight(1).
 			Bold(true)
 
+	// Status badge
 	statusStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#FFFDF5")).
-			Background(lipgloss.Color("#32CD32")).
-			Padding(0, 1).
+			Foreground(darkBg).
+			Background(primaryGreen).
+			Padding(0, 2).
+			Bold(true)
+
+	// Warning/error style
+	warningStyle = lipgloss.NewStyle().
+			Foreground(darkBg).
+			Background(laravelOrange).
+			Padding(0, 2).
+			Bold(true)
+
+	// Help text style
+	helpStyle = lipgloss.NewStyle().
+			Foreground(mutedText).
+			MarginTop(1)
+
+	// Connection info style
+	connectionStyle = lipgloss.NewStyle().
+			Foreground(highlightColor).
 			Bold(true)
 )
 
@@ -90,7 +143,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	if m.choice != nil {
-		return lipgloss.NewStyle().Padding(1, 2).Render(fmt.Sprintf("🚀 Connecting to %s...", m.choice.Name))
+		connectMsg := lipgloss.NewStyle().
+			Foreground(lightText).
+			Bold(true).
+			Render(fmt.Sprintf("🚀 Connecting to %s...", connectionStyle.Render(m.choice.Name)))
+		return appStyle.Render(connectMsg)
 	}
 	if m.quitting {
 		return ""
@@ -100,31 +157,64 @@ func (m Model) View() string {
 	var details string
 	if ok {
 		conn := curItem.conn
+
+		// Build tags section
 		var tagsStr strings.Builder
-		for _, tag := range conn.Tags {
-			tagsStr.WriteString(tagStyle.Render(tag))
-			tagsStr.WriteString(" ")
+		if len(conn.Tags) > 0 {
+			for _, tag := range conn.Tags {
+				tagsStr.WriteString(tagStyle.Render("# " + tag))
+				tagsStr.WriteString(" ")
+			}
+		} else {
+			tagsStr.WriteString(lipgloss.NewStyle().Foreground(mutedText).Render("No tags"))
+		}
+
+		// Build connection details with icons and better formatting
+		authType := getAuthType(conn)
+		authIcon := "🔑"
+		if strings.Contains(authType, "Password") {
+			authIcon = "🔐"
+		} else if strings.Contains(authType, "Agent") {
+			authIcon = "🎫"
 		}
 
 		info := []string{
-			fmt.Sprintf("Name:     %s", lipgloss.NewStyle().Bold(true).Render(conn.Name)),
-			fmt.Sprintf("Host:     %s", conn.Host),
-			fmt.Sprintf("User:     %s", conn.User),
-			fmt.Sprintf("Port:     %d", conn.Port),
-			fmt.Sprintf("Auth:     %s", getAuthType(conn)),
+			lipgloss.NewStyle().
+				Foreground(accentCyan).
+				Bold(true).
+				Render("━━━ CONNECTION DETAILS ━━━"),
 			"",
-			fmt.Sprintf("Tags:     %s", tagsStr.String()),
+			labelStyle.Render("🏷️  Name:") + "    " + valueStyle.Render(conn.Name),
+			labelStyle.Render("🌐 Host:") + "    " + valueStyle.Render(conn.Host),
+			labelStyle.Render("👤 User:") + "    " + valueStyle.Render(conn.User),
+			labelStyle.Render("🔌 Port:") + "    " + valueStyle.Render(fmt.Sprintf("%d", conn.Port)),
+			labelStyle.Render(authIcon+" Auth:") + "    " + valueStyle.Render(authType),
 			"",
-			fmt.Sprintf("Status:   %s", statusStyle.Render("REACHABLE")),
+			labelStyle.Render("🏷️  Tags:") + "    " + tagsStr.String(),
 		}
 
+		// Add jump host if present
+		if conn.JumpHost != "" {
+			info = append(info, "")
+			info = append(info, labelStyle.Render("🔀 Jump:")+"    "+valueStyle.Render(conn.JumpHost))
+		}
+
+		// Add status
+		info = append(info, "")
+		info = append(info, labelStyle.Render("📊 Status:")+"   "+statusStyle.Render(" ✓ READY "))
+
+		// Add help text
+		info = append(info, "")
+		info = append(info, "")
+		info = append(info, helpStyle.Render("Press Enter to connect • / to filter • q to quit"))
+
 		dWidth := m.width - m.width/3 - 10
-		if dWidth < 20 {
-			dWidth = 20
+		if dWidth < 30 {
+			dWidth = 30
 		}
 		dHeight := m.height - 8
-		if dHeight < 5 {
-			dHeight = 5
+		if dHeight < 10 {
+			dHeight = 10
 		}
 
 		details = detailStyle.
@@ -136,10 +226,14 @@ func (m Model) View() string {
 	listView := m.list.View()
 	mainView := lipgloss.JoinHorizontal(lipgloss.Top, listView, details)
 
+	// Create header with version info
+	header := headerStyle.Render("⚡ LEAP SSH MANAGER")
+	subtitle := subtitleStyle.Render("Manage your SSH connections with ease")
+
 	return appStyle.Render(
 		lipgloss.JoinVertical(lipgloss.Left,
-			titleStyle.Render("LEAP SSH MANAGER"),
-			"",
+			header,
+			subtitle,
 			mainView,
 		),
 	)
@@ -168,11 +262,29 @@ func InitialModel(cfg *config.Config) Model {
 	const defaultWidth = 40
 	const listHeight = 14
 
-	l := list.New(items, list.NewDefaultDelegate(), defaultWidth, listHeight)
-	l.Title = "Connections"
+	// Create custom delegate for better styling
+	delegate := list.NewDefaultDelegate()
+	delegate.Styles.SelectedTitle = delegate.Styles.SelectedTitle.
+		Foreground(primaryGreen).
+		BorderForeground(primaryGreen).
+		Bold(true)
+	delegate.Styles.SelectedDesc = delegate.Styles.SelectedDesc.
+		Foreground(accentCyan).
+		BorderForeground(primaryGreen)
+
+	l := list.New(items, delegate, defaultWidth, listHeight)
+	l.Title = "📡 Connections"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(true)
-	l.Styles.Title = lipgloss.NewStyle().Foreground(lipgloss.Color("#7D56F4")).Bold(true)
+	l.Styles.Title = lipgloss.NewStyle().
+		Foreground(accentCyan).
+		Bold(true).
+		MarginLeft(1)
+	l.Styles.FilterPrompt = lipgloss.NewStyle().
+		Foreground(primaryGreen).
+		Bold(true)
+	l.Styles.FilterCursor = lipgloss.NewStyle().
+		Foreground(highlightColor)
 
 	return Model{list: l}
 }

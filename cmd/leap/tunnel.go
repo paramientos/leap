@@ -19,13 +19,14 @@ var tunnelCmd = &cobra.Command{
 
 		cfg, err := config.LoadConfig(GetPassphrase())
 		if err != nil {
-			fmt.Printf("Error loading config: %v\n", err)
+			fmt.Printf("\n❌ Error loading config: %v\n\n", err)
 			return
 		}
 
 		conn, ok := cfg.Connections[name]
 		if !ok {
-			fmt.Printf("Connection '%s' not found.\n", name)
+			fmt.Printf("\n❌ Connection '\033[1;36m%s\033[0m' not found.\n", name)
+			fmt.Println("\033[90mTip: Use 'leap list' to see all available connections\033[0m\n")
 			return
 		}
 
@@ -42,8 +43,10 @@ var tunnelCmd = &cobra.Command{
 		sshArgs = append(sshArgs, "-N") // Do not execute a remote command
 		sshArgs = append(sshArgs, fmt.Sprintf("%s@%s", conn.User, conn.Host))
 
-		fmt.Printf("✓ Opening tunnel: %s -> %s\n", tunnelSpec, name)
-		fmt.Println("Press Ctrl+C to close the tunnel.")
+		fmt.Println("\n⚡ \033[1;32mSSH Tunnel\033[0m")
+		fmt.Println("\033[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
+		fmt.Printf("\n\033[32m✓\033[0m Opening tunnel: \033[1;35m%s\033[0m → \033[1;36m%s\033[0m\n", tunnelSpec, name)
+		fmt.Printf("\033[90mPress Ctrl+C to close the tunnel\033[0m\n\n")
 
 		c := exec.Command("ssh", sshArgs...)
 		c.Stdin = os.Stdin
@@ -52,7 +55,9 @@ var tunnelCmd = &cobra.Command{
 
 		err = c.Run()
 		if err != nil {
-			fmt.Printf("Tunnel closed: %v\n", err)
+			fmt.Printf("\n❌ Tunnel closed: %v\n\n", err)
+		} else {
+			fmt.Println("\n\033[32m✓\033[0m Tunnel closed successfully\n")
 		}
 	},
 }

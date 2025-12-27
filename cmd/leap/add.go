@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/manifoldco/promptui"
 	"github.com/paramientos/leap/internal/config"
@@ -14,34 +15,38 @@ var addCmd = &cobra.Command{
 	Use:   "add [name]",
 	Short: "Add a new SSH connection",
 	Run: func(cmd *cobra.Command, args []string) {
+		// Print header
+		fmt.Println("\n⚡ \033[1;32mAdd New SSH Connection\033[0m")
+		fmt.Println("\033[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m\n")
+
 		var name string
 		if len(args) > 0 {
 			name = args[0]
 		} else {
 			prompt := promptui.Prompt{
-				Label: "Connection Name (alias)",
+				Label: "🏷️  Connection Name (alias)",
 			}
 			var err error
 			name, err = prompt.Run()
 			if err != nil {
-				fmt.Printf("Prompt failed %v\n", err)
+				fmt.Printf("\n❌ Prompt failed %v\n", err)
 				return
 			}
 		}
 
 		promptHost := promptui.Prompt{
-			Label: "Hostname",
+			Label: "🌐 Hostname",
 		}
 		host, _ := promptHost.Run()
 
 		promptUser := promptui.Prompt{
-			Label:   "User",
+			Label:   "👤 User",
 			Default: "root",
 		}
 		user, _ := promptUser.Run()
 
 		promptPort := promptui.Prompt{
-			Label:   "Port",
+			Label:   "🔌 Port",
 			Default: "22",
 			Validate: func(input string) error {
 				_, err := strconv.Atoi(input)
@@ -52,18 +57,18 @@ var addCmd = &cobra.Command{
 		port, _ := strconv.Atoi(portStr)
 
 		promptPass := promptui.Prompt{
-			Label: "Password (optional)",
+			Label: "🔐 Password (optional)",
 			Mask:  '*',
 		}
 		password, _ := promptPass.Run()
 
 		promptKey := promptui.Prompt{
-			Label: "SSH Key Path (optional)",
+			Label: "🔑 SSH Key Path (optional)",
 		}
 		key, _ := promptKey.Run()
 
 		promptTags := promptui.Prompt{
-			Label: "Tags (comma separated)",
+			Label: "🏷️  Tags (comma separated)",
 		}
 		tagsStr, _ := promptTags.Run()
 		var tags []string
@@ -75,13 +80,13 @@ var addCmd = &cobra.Command{
 		}
 
 		promptJump := promptui.Prompt{
-			Label: "Jump Host (optional)",
+			Label: "🔀 Jump Host (optional)",
 		}
 		jump, _ := promptJump.Run()
 
 		cfg, err := config.LoadConfig(GetPassphrase())
 		if err != nil {
-			fmt.Printf("Error loading config: %v\n", err)
+			fmt.Printf("\n❌ Error loading config: %v\n", err)
 			return
 		}
 
@@ -94,15 +99,17 @@ var addCmd = &cobra.Command{
 			IdentityFile: key,
 			Tags:         tags,
 			JumpHost:     jump,
+			CreatedAt:    time.Now(),
 		}
 
 		err = config.SaveConfig(cfg, GetPassphrase())
 		if err != nil {
-			fmt.Printf("Error saving config: %v\n", err)
+			fmt.Printf("\n❌ Error saving config: %v\n", err)
 			return
 		}
 
-		fmt.Printf("✓ Saved '%s'\n", name)
+		fmt.Println("\n\033[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
+		fmt.Printf("\n\033[32m✓\033[0m Connection \033[1;36m%s\033[0m saved successfully!\n\n", name)
 	},
 }
 
