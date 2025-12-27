@@ -8,19 +8,17 @@ REPO="paramientos/leap"
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="leap"
 
-# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 echo -e "${BLUE}"
 echo "⚡ LEAP SSH Manager Installer"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo -e "${NC}"
 
-# Detect OS and Architecture
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
 
@@ -63,16 +61,13 @@ fi
 
 echo -e "${GREEN}✓${NC} Latest version: ${YELLOW}${LATEST_VERSION}${NC}"
 
-# Download URL
 DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${LATEST_VERSION}/${BINARY_NAME}-${LATEST_VERSION#v}-${PLATFORM}-${ARCH}.tar.gz"
 
 echo -e "${BLUE}→${NC} Downloading from: ${DOWNLOAD_URL}"
 
-# Create temp directory
 TMP_DIR=$(mktemp -d)
 cd "$TMP_DIR"
 
-# Download and extract
 if ! curl -fsSL "$DOWNLOAD_URL" -o "${BINARY_NAME}.tar.gz"; then
     echo -e "${RED}✗ Download failed${NC}"
     rm -rf "$TMP_DIR"
@@ -81,17 +76,14 @@ fi
 
 echo -e "${GREEN}✓${NC} Downloaded successfully"
 
-# Extract
 tar -xzf "${BINARY_NAME}.tar.gz"
 
-# Check if binary exists
 if [ ! -f "${BINARY_NAME}-${PLATFORM}-${ARCH}" ]; then
     echo -e "${RED}✗ Binary not found in archive${NC}"
     rm -rf "$TMP_DIR"
     exit 1
 fi
 
-# Install
 echo -e "${BLUE}→${NC} Installing to ${INSTALL_DIR}..."
 
 if [ -w "$INSTALL_DIR" ]; then
@@ -103,11 +95,10 @@ else
     sudo chmod +x "${INSTALL_DIR}/${BINARY_NAME}"
 fi
 
-# Cleanup
 cd - > /dev/null
+
 rm -rf "$TMP_DIR"
 
-# Verify installation
 if command -v leap &> /dev/null; then
     VERSION=$(leap --version 2>&1 | head -n 1)
     echo ""
