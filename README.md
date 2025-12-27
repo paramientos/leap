@@ -95,7 +95,7 @@ leap add myserver
 ```
 
 You'll be prompted for:
-- 🌐 Hostname
+- 🌐 Hostname/IP
 - 👤 User
 - 🔌 Port
 - 🔐 Password (optional)
