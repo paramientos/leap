@@ -8,7 +8,9 @@ A modern, beautiful CLI tool to manage your SSH connections with an intuitive te
 ## ✨ Features
 
 - 🔐 **Secure encrypted configuration** - Your main config is safely encrypted
-- 🏷️ **Tag-based organization** - Organize connections with custom tags
+- 📊 **Real-time Monitoring** - Watch server Load, RAM and Uptime in a live TUI
+- 🔑 **Self-Managed SSH Keys** - Generate and push Leap-specific SSH keys automatically
+- 🏷️ **Tag-based & Group organization** - Organize connections with tags and folders
 - 🔍 **Fuzzy search & filtering** - Find connections quickly
 - 🎨 **Beautiful terminal UI** - Modern, colorful interface inspired by Laravel
 - 🔀 **Jump host support** - Connect through bastion hosts
@@ -16,12 +18,10 @@ A modern, beautiful CLI tool to manage your SSH connections with an intuitive te
 - ⚡ **Fast and lightweight** - Built with Go for maximum performance
 - ⭐ **Favorites system** - Mark frequently used connections
 - 📝 **Connection notes** - Add notes to your connections
-- 🧪 **Health checks** - Test connections and measure latency
+- 🧪 **Health checks** - Test connections and measure latency with visual bars
 - 📤 **Plain-text Export/Import** - Easily backup and share configurations
 - 🖥️ **Remote execution** - Run commands on multiple servers
-- 📁 **File transfer** - Upload/download files via SCP
-- ✏️ **Edit connections** - Update existing connections easily
-- 🗑️ **Bulk operations** - Delete multiple connections at once
+- 📁 **SSH Config Import** - Migrate from `~/.ssh/config` in one command
 
 ## 📦 Installation
 
@@ -146,6 +146,36 @@ leap download myserver /remote/folder/ ./ --recursive
 ```
 
 ### Export/Import
+
+### Health & Monitoring
+
+Check if your servers are alive or watch their resources in real-time.
+
+```bash
+# Health check (with visual latency bars)
+leap test --all
+
+# Live Resource Monitor (CPU, RAM, Uptime)
+leap monitor
+leap monitor server1 server2
+```
+
+### SSH Key Wizard
+
+Automate passwordless login by generating and pushing LEAP-specific keys.
+
+```bash
+# Generates a key if missing and pushes it to the server
+leap push-key myserver
+```
+
+### Import from SSH Config
+
+Migrate your existing connections from your system's SSH configuration.
+
+```bash
+leap import-ssh
+```
 
 ### Export/Import
 
