@@ -1,0 +1,95 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          
+      - name: Get version
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=0.6.0" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Build for all platforms
+        run: |
+          mkdir -p build
+          
+          # Linux AMD64
+          GOOS=linux GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${{ steps.version.outputs.VERSION }}" -o build/leap-linux-amd64 ./cmd/leap
+          
+          # Linux ARM64
+          GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -X main.Version=${{ steps.version.outputs.VERSION }}" -o build/leap-linux-arm64 ./cmd/leap
+          
+          # macOS AMD64
+          GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${{ steps.version.outputs.VERSION }}" -o build/leap-darwin-amd64 ./cmd/leap
+          
+          # macOS ARM64 (Apple Silicon)
+          GOOS=darwin GOARCH=arm64 go build -ldflags "-s -w -X main.Version=${{ steps.version.outputs.VERSION }}" -o build/leap-darwin-arm64 ./cmd/leap
+          
+          # Windows AMD64
+          GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${{ steps.version.outputs.VERSION }}" -o build/leap-windows-amd64.exe ./cmd/leap
+          
+          # Windows ARM64
+          GOOS=windows GOARCH=arm64 go build -ldflags "-s -w -X main.Version=${{ steps.version.outputs.VERSION }}" -o build/leap-windows-arm64.exe ./cmd/leap
+          
+      - name: Create release archives
+        run: |
+          mkdir -p build/release
+          cd build
+          
+          # Create tar.gz for Unix systems
+          tar -czf release/leap-${{ steps.version.outputs.VERSION }}-linux-amd64.tar.gz leap-linux-amd64
+          tar -czf release/leap-${{ steps.version.outputs.VERSION }}-linux-arm64.tar.gz leap-linux-arm64
+          tar -czf release/leap-${{ steps.version.outputs.VERSION }}-darwin-amd64.tar.gz leap-darwin-amd64
+          tar -czf release/leap-${{ steps.version.outputs.VERSION }}-darwin-arm64.tar.gz leap-darwin-arm64
+          
+          # Create zip for Windows
+          zip -q release/leap-${{ steps.version.outputs.VERSION }}-windows-amd64.zip leap-windows-amd64.exe
+          zip -q release/leap-${{ steps.version.outputs.VERSION }}-windows-arm64.zip leap-windows-arm64.exe
+          
+      - name: Generate checksums
+        run: |
+          cd build/release
+          sha256sum * > checksums.txt
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            build/release/*.tar.gz
+            build/release/*.zip
+            build/release/checksums.txt
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: leap-binaries
+          path: build/release/

@@ -20,3 +20,21 @@ vendor/
 
 .DS_Store
 /leap
+
+# Build directory
+build/
+
+# Snapshot files
+*.json
+*.yaml
+!go.mod
+!go.sum
+
+# LEAP config and history
+.leap/
+
+git add .
+git commit -m "Release v0.6.0"
+git tag v0.6.0
+git push origin main
+git push origin v0.6.0

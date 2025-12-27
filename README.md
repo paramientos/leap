@@ -38,11 +38,36 @@ All in a single binary with zero dependencies!
 
 ## 📦 Installation
 
-### From Source
+### Download Pre-built Binaries
+
+Download the latest release for your platform from [GitHub Releases](https://github.com/paramientos/leap/releases):
+
+- **Linux (AMD64/ARM64)**
+- **macOS (Intel/Apple Silicon)**
+- **Windows (AMD64/ARM64)**
+
+```bash
+# Extract and install (Linux/macOS)
+tar -xzf leap-*.tar.gz
+sudo mv leap /usr/local/bin/
+
+# Make executable
+chmod +x /usr/local/bin/leap
+```
+
+### Build from Source
 
 ```bash
 git clone https://github.com/paramientos/leap.git
 cd leap
+
+# Using Makefile (recommended)
+make build          # Build for current platform
+make install        # Build and install to /usr/local/bin
+make build-all      # Build for all platforms
+make release        # Create release archives
+
+# Or using Go directly
 go build -o leap ./cmd/leap
 sudo mv leap /usr/local/bin/
 ```
@@ -341,18 +366,39 @@ When adding a connection, specify a jump host:
 ### Prerequisites
 
 - Go 1.24 or higher
-- Terminal with true color support
+- Make (optional, but recommended)
 
 ### Building
 
 ```bash
+# Using Makefile
+make build          # Build for current platform
+make build-all      # Build for all platforms
+make install        # Install to /usr/local/bin
+
+# Or using Go directly
 go build -o leap ./cmd/leap
 ```
 
 ### Running Tests
 
 ```bash
+make test
+# or
 go test ./...
+```
+
+### Available Make Commands
+
+```bash
+make help           # Show all available commands
+make build          # Build for current platform
+make build-all      # Build for all platforms
+make install        # Build and install
+make clean          # Clean build artifacts
+make test           # Run tests
+make deps           # Update dependencies
+make release        # Create release archives
 ```
 
 ## 🤝 Contributing
