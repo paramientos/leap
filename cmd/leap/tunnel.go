@@ -18,23 +18,29 @@ var tunnelCmd = &cobra.Command{
 		tunnelSpec := args[1]
 
 		cfg, err := config.LoadConfig(GetPassphrase())
+
 		if err != nil {
 			fmt.Printf("\n❌ Error loading config: %v\n\n", err)
 			return
 		}
 
 		conn, ok := cfg.Connections[name]
+
 		if !ok {
 			fmt.Printf("\n❌ Connection '\033[1;36m%s\033[0m' not found.\n", name)
 			fmt.Println("\033[90mTip: Use 'leap list' to see all available connections\033[0m\n")
+
 			return
 		}
 
 		sshArgs := []string{}
+
 		if conn.IdentityFile != "" {
 			sshArgs = append(sshArgs, "-i", conn.IdentityFile)
 		}
+
 		sshArgs = append(sshArgs, "-p", fmt.Sprintf("%d", conn.Port))
+
 		if conn.JumpHost != "" {
 			sshArgs = append(sshArgs, "-J", conn.JumpHost)
 		}
@@ -54,6 +60,7 @@ var tunnelCmd = &cobra.Command{
 		c.Stderr = os.Stderr
 
 		err = c.Run()
+
 		if err != nil {
 			fmt.Printf("\n❌ Tunnel closed: %v\n\n", err)
 		} else {

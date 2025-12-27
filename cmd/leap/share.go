@@ -15,6 +15,7 @@ var shareCmd = &cobra.Command{
 	Use:   "share [name]",
 	Short: "Share a connection via QR Code or Short-link",
 	Args:  cobra.ExactArgs(1),
+
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
 		cfg, err := config.LoadConfig(GetPassphrase())
@@ -29,7 +30,6 @@ var shareCmd = &cobra.Command{
 			return
 		}
 
-		// Share only essential fields to keep QR code small
 		type ShareData struct {
 			N string   `json:"n"`
 			H string   `json:"h"`
@@ -113,7 +113,6 @@ var importCodeCmd = &cobra.Command{
 			return
 		}
 
-		// Map back to Connection
 		conn := config.Connection{
 			Name:     s.N,
 			Host:     s.H,
@@ -125,9 +124,12 @@ var importCodeCmd = &cobra.Command{
 		}
 
 		cfg.Connections[conn.Name] = conn
+
 		err = config.SaveConfig(cfg, GetPassphrase())
+
 		if err != nil {
 			fmt.Printf("\n❌ Error saving config: %v\n\n", err)
+
 			return
 		}
 

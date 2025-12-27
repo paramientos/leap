@@ -38,3 +38,5 @@ git commit -m "Release v0.6.0"
 git tag v0.6.0
 git push origin main
 git push origin v0.6.0
+
+git tag -d v0.6.0 && git push origin :refs/tags/v0.6.0

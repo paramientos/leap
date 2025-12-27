@@ -24,6 +24,7 @@ func Connect(conn config.Connection, record bool) error {
 		path := filepath.Join(historyDir, fileName)
 
 		f, err := os.Create(path)
+
 		if err == nil {
 			recordingFile = f
 			defer f.Close()
@@ -31,12 +32,10 @@ func Connect(conn config.Connection, record bool) error {
 		}
 	}
 
-	// If password is provided, use Go SSH client
 	if conn.Password != "" && conn.IdentityFile == "" {
 		return connectWithPassword(conn, recordingFile)
 	}
 
-	// Fallback to system SSH
 	return connectWithSystemSSH(conn, recordingFile)
 }
 
@@ -57,10 +56,13 @@ func buildSSHArgs(conn config.Connection) []string {
 	if conn.IdentityFile != "" {
 		args = append(args, "-i", conn.IdentityFile)
 	}
+
 	args = append(args, "-p", fmt.Sprintf("%d", conn.Port))
+
 	if conn.JumpHost != "" {
 		args = append(args, "-J", conn.JumpHost)
 	}
+
 	target := fmt.Sprintf("%s@%s", conn.User, conn.Host)
 	args = append(args, target)
 
@@ -78,34 +80,40 @@ func connectWithPassword(conn config.Connection, recording io.Writer) error {
 	}
 
 	addr := fmt.Sprintf("%s:%d", conn.Host, conn.Port)
+
 	client, err := ssh.Dial("tcp", addr, sshConfig)
+
 	if err != nil {
 		return fmt.Errorf("failed to dial: %v", err)
 	}
+
 	defer client.Close()
 
 	session, err := client.NewSession()
+
 	if err != nil {
 		return fmt.Errorf("failed to create session: %v", err)
 	}
 	defer session.Close()
 
-	// Set up terminal modes
 	modes := ssh.TerminalModes{
-		ssh.ECHO:          1,     // enable echoing
-		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
-		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
+		ssh.ECHO:          1,
+		ssh.TTY_OP_ISPEED: 14400,
+		ssh.TTY_OP_OSPEED: 14400,
 	}
 
 	fileDescriptor := int(os.Stdin.Fd())
 	if term.IsTerminal(fileDescriptor) {
 		originalState, err := term.MakeRaw(fileDescriptor)
+
 		if err != nil {
 			return err
 		}
+
 		defer term.Restore(fileDescriptor, originalState)
 
 		width, height, err := term.GetSize(fileDescriptor)
+
 		if err != nil {
 			return err
 		}
@@ -120,6 +128,7 @@ func connectWithPassword(conn config.Connection, recording io.Writer) error {
 	} else {
 		session.Stdout = os.Stdout
 	}
+
 	session.Stderr = os.Stderr
 	session.Stdin = os.Stdin
 

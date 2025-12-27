@@ -11,7 +11,6 @@ import (
 )
 
 var (
-	// Laravel-inspired color palette
 	laravelRed     = lipgloss.Color("#FF2D20")
 	laravelOrange  = lipgloss.Color("#FF6B35")
 	primaryGreen   = lipgloss.Color("#10B981")
@@ -22,7 +21,6 @@ var (
 	borderColor    = lipgloss.Color("#374151")
 	highlightColor = lipgloss.Color("#3B82F6")
 
-	// Main app container
 	appStyle = lipgloss.NewStyle().
 			Padding(1, 2).
 			Background(lipgloss.Color("#111827"))
@@ -35,13 +33,10 @@ var (
 			Bold(true).
 			MarginBottom(1)
 
-	// Subtitle style
 	subtitleStyle = lipgloss.NewStyle().
 			Foreground(mutedText).
 			Italic(true).
 			MarginBottom(1)
-
-	// Detail panel with modern styling
 	detailStyle = lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder()).
 			BorderForeground(borderColor).
@@ -49,17 +44,13 @@ var (
 			MarginLeft(2).
 			Background(darkBg)
 
-	// Label style for detail fields
 	labelStyle = lipgloss.NewStyle().
 			Foreground(accentCyan).
 			Bold(true).
 			Width(12)
-
-	// Value style for detail fields
 	valueStyle = lipgloss.NewStyle().
 			Foreground(lightText)
 
-	// Tag with modern pill design
 	tagStyle = lipgloss.NewStyle().
 			Foreground(darkBg).
 			Background(accentCyan).
@@ -67,26 +58,22 @@ var (
 			MarginRight(1).
 			Bold(true)
 
-	// Status badge
 	statusStyle = lipgloss.NewStyle().
 			Foreground(darkBg).
 			Background(primaryGreen).
 			Padding(0, 2).
 			Bold(true)
 
-	// Warning/error style
 	warningStyle = lipgloss.NewStyle().
 			Foreground(darkBg).
 			Background(laravelOrange).
 			Padding(0, 2).
 			Bold(true)
 
-	// Help text style
 	helpStyle = lipgloss.NewStyle().
 			Foreground(mutedText).
 			MarginTop(1)
 
-	// Connection info style
 	connectionStyle = lipgloss.NewStyle().
 			Foreground(highlightColor).
 			Bold(true)
@@ -122,13 +109,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			m.quitting = true
 			return m, tea.Quit
+
 		case "enter":
 			i, ok := m.list.SelectedItem().(item)
+
 			if ok {
 				m.choice = &i.conn
 			}
+
 			return m, tea.Quit
 		}
+
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
@@ -138,6 +129,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	var cmd tea.Cmd
 	m.list, cmd = m.list.Update(msg)
+
 	return m, cmd
 }
 
@@ -149,17 +141,19 @@ func (m Model) View() string {
 			Render(fmt.Sprintf("🚀 Connecting to %s...", connectionStyle.Render(m.choice.Name)))
 		return appStyle.Render(connectMsg)
 	}
+
 	if m.quitting {
 		return ""
 	}
 
 	curItem, ok := m.list.SelectedItem().(item)
 	var details string
+
 	if ok {
 		conn := curItem.conn
 
-		// Build tags section
 		var tagsStr strings.Builder
+
 		if len(conn.Tags) > 0 {
 			for _, tag := range conn.Tags {
 				tagsStr.WriteString(tagStyle.Render("# " + tag))
@@ -169,9 +163,9 @@ func (m Model) View() string {
 			tagsStr.WriteString(lipgloss.NewStyle().Foreground(mutedText).Render("No tags"))
 		}
 
-		// Build connection details with icons and better formatting
 		authType := getAuthType(conn)
 		authIcon := "🔑"
+
 		if strings.Contains(authType, "Password") {
 			authIcon = "🔐"
 		} else if strings.Contains(authType, "Agent") {
@@ -193,26 +187,25 @@ func (m Model) View() string {
 			labelStyle.Render("🏷️  Tags:") + "    " + tagsStr.String(),
 		}
 
-		// Add jump host if present
 		if conn.JumpHost != "" {
 			info = append(info, "")
 			info = append(info, labelStyle.Render("🔀 Jump:")+"    "+valueStyle.Render(conn.JumpHost))
 		}
 
-		// Add status
 		info = append(info, "")
 		info = append(info, labelStyle.Render("📊 Status:")+"   "+statusStyle.Render(" ✓ READY "))
 
-		// Add help text
 		info = append(info, "")
 		info = append(info, "")
 		info = append(info, helpStyle.Render("Press Enter to connect • / to filter • q to quit"))
 
 		dWidth := m.width - m.width/3 - 10
+
 		if dWidth < 30 {
 			dWidth = 30
 		}
 		dHeight := m.height - 8
+
 		if dHeight < 10 {
 			dHeight = 10
 		}
@@ -226,7 +219,7 @@ func (m Model) View() string {
 	listView := m.list.View()
 	mainView := lipgloss.JoinHorizontal(lipgloss.Top, listView, details)
 
-	// Create header with version info
+	// @todo: In fact brand name should come from the .env file
 	header := headerStyle.Render("⚡ LEAP SSH MANAGER")
 	subtitle := subtitleStyle.Render("Manage your SSH connections with ease")
 
@@ -262,12 +255,12 @@ func InitialModel(cfg *config.Config) Model {
 	const defaultWidth = 40
 	const listHeight = 14
 
-	// Create custom delegate for better styling
 	delegate := list.NewDefaultDelegate()
 	delegate.Styles.SelectedTitle = delegate.Styles.SelectedTitle.
 		Foreground(primaryGreen).
 		BorderForeground(primaryGreen).
 		Bold(true)
+
 	delegate.Styles.SelectedDesc = delegate.Styles.SelectedDesc.
 		Foreground(accentCyan).
 		BorderForeground(primaryGreen)
@@ -293,13 +286,16 @@ func Run(cfg *config.Config) (*config.Connection, error) {
 	m := InitialModel(cfg)
 	p := tea.NewProgram(m, tea.WithAltScreen())
 	finalModel, err := p.Run()
+
 	if err != nil {
 		return nil, err
 	}
 
 	res, ok := finalModel.(Model)
+
 	if !ok {
 		return nil, fmt.Errorf("unexpected model type")
 	}
+
 	return res.choice, nil
 }

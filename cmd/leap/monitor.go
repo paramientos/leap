@@ -47,8 +47,7 @@ var monitorCmd = &cobra.Command{
 				}
 			}
 		} else {
-			// If no args, maybe just monitor everything or show selection?
-			// Let's monitor everything by default if it's a TUI tool
+			// If no args maybe just monitor everything or show selection
 			for _, conn := range cfg.Connections {
 				connsToMonitor = append(connsToMonitor, conn)
 			}
@@ -60,6 +59,7 @@ var monitorCmd = &cobra.Command{
 		}
 
 		err = tui.RunMonitor(connsToMonitor)
+
 		if err != nil {
 			fmt.Printf("\n❌ Error running monitor: %v\n\n", err)
 			os.Exit(1)
@@ -70,5 +70,6 @@ var monitorCmd = &cobra.Command{
 func init() {
 	monitorCmd.Flags().BoolP("all", "a", false, "Monitor all connections")
 	monitorCmd.Flags().StringP("tag", "t", "", "Monitor connections with specific tag")
+
 	rootCmd.AddCommand(monitorCmd)
 }

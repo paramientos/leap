@@ -81,7 +81,6 @@ func (m monitorModel) fetchStats(index int, conn config.Connection) tea.Cmd {
 			}
 		}
 
-		// Support SSH Agent
 		if socket := os.Getenv("SSH_AUTH_SOCK"); socket != "" {
 			netConn, err := net.Dial("unix", socket)
 			if err == nil {
@@ -89,12 +88,12 @@ func (m monitorModel) fetchStats(index int, conn config.Connection) tea.Cmd {
 			}
 		}
 
-		// Try saved password
 		if conn.Password != "" {
 			sshConfig.Auth = append(sshConfig.Auth, ssh.Password(conn.Password))
 		}
 
 		addr := fmt.Sprintf("%s:%d", conn.Host, conn.Port)
+
 		client, err := ssh.Dial("tcp", addr, sshConfig)
 		if err != nil {
 			s.Error = err
@@ -109,18 +108,19 @@ func (m monitorModel) fetchStats(index int, conn config.Connection) tea.Cmd {
 		}
 		defer session.Close()
 
-		// Robust command: each output on its own line
 		cmd := "cat /proc/uptime | awk '{print int($1/3600)\"h \"int(($1%3600)/60)\"m\"}'; " +
 			"free | awk 'NR==2{print int($3*100/$2)\"%\"}'; " +
 			"cat /proc/loadavg | awk '{print $1}'"
 
 		output, err := session.Output(cmd)
+
 		if err != nil {
 			s.Error = err
 			return serverStats{index, s}
 		}
 
 		lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+
 		if len(lines) >= 3 {
 			s.Uptime = lines[0]
 			s.RAM = lines[1]
@@ -135,22 +135,25 @@ func (m monitorModel) fetchStats(index int, conn config.Connection) tea.Cmd {
 
 func (m monitorModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "ctrl+c":
 			m.quitting = true
 			return m, tea.Quit
 		}
+
 	case tickMsg:
 		return m, tea.Batch(m.updateAllStats(), tick())
+
 	case serverStats:
 		m.stats[msg.index] = msg.stats
 		m.updateTableRows()
+
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
 		m.table.SetWidth(msg.Width - 4)
-		// Leave some room for header/footer
 		m.table.SetHeight(msg.Height - 10)
 	}
 
@@ -243,10 +246,12 @@ func RunMonitor(conns []config.Connection) error {
 		BorderBottom(true).
 		Foreground(lipgloss.Color("86")).
 		Bold(true)
+
 	s.Selected = s.Selected.
 		Foreground(lipgloss.Color("229")).
 		Background(lipgloss.Color("62")).
 		Bold(true)
+
 	t.SetStyles(s)
 
 	m := monitorModel{
@@ -259,5 +264,6 @@ func RunMonitor(conns []config.Connection) error {
 
 	p := tea.NewProgram(m, tea.WithAltScreen())
 	_, err := p.Run()
+
 	return err
 }

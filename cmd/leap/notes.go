@@ -16,12 +16,14 @@ var notesCmd = &cobra.Command{
 		name := args[0]
 
 		cfg, err := config.LoadConfig(GetPassphrase())
+
 		if err != nil {
 			fmt.Printf("\n❌ Error loading config: %v\n\n", err)
 			return
 		}
 
 		conn, ok := cfg.Connections[name]
+
 		if !ok {
 			fmt.Printf("\n❌ Connection '\033[1;36m%s\033[0m' not found.\n", name)
 			fmt.Println("\033[90mTip: Use 'leap list' to see all available connections\033[0m\n")
@@ -35,7 +37,9 @@ var notesCmd = &cobra.Command{
 				Label:   "📝 Notes",
 				Default: conn.Notes,
 			}
+
 			notes, err := prompt.Run()
+
 			if err != nil {
 				fmt.Printf("\n❌ Prompt failed: %v\n\n", err)
 				return
@@ -43,6 +47,7 @@ var notesCmd = &cobra.Command{
 
 			cfg.SetNotes(name, notes)
 			err = config.SaveConfig(cfg, GetPassphrase())
+
 			if err != nil {
 				fmt.Printf("\n❌ Error saving config: %v\n\n", err)
 				return
@@ -68,5 +73,6 @@ var notesCmd = &cobra.Command{
 
 func init() {
 	notesCmd.Flags().BoolP("edit", "e", false, "Edit notes")
+
 	rootCmd.AddCommand(notesCmd)
 }

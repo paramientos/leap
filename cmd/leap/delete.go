@@ -21,6 +21,7 @@ var deleteCmd = &cobra.Command{
 		}
 
 		cfg, err := config.LoadConfig(GetPassphrase())
+
 		if err != nil {
 			fmt.Printf("\n❌ Error loading config: %v\n\n", err)
 			return
@@ -68,6 +69,7 @@ var deleteCmd = &cobra.Command{
 				fmt.Printf("\n❌ Error saving config: %v\n\n", err)
 				return
 			}
+
 			fmt.Println("\n\033[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
 			fmt.Printf("\n\033[32m✓\033[0m Successfully deleted \033[1m%d\033[0m connection(s)\n\n", len(deleted))
 		} else {
@@ -78,5 +80,6 @@ var deleteCmd = &cobra.Command{
 
 func init() {
 	deleteCmd.Flags().BoolP("force", "f", false, "Skip confirmation prompt")
+
 	rootCmd.AddCommand(deleteCmd)
 }

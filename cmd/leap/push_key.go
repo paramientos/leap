@@ -1,5 +1,8 @@
 package main
 
+// We can create a ssh key direcdtly in the server by usign ssh itself again
+// ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -C "leap-ssh-manager" etc
+
 import (
 	"fmt"
 	"os"
@@ -32,18 +35,20 @@ var pushKeyCmd = &cobra.Command{
 		leapKeyPath := filepath.Join(home, ".leap", "id_ed25519")
 		leapPubKeyPath := leapKeyPath + ".pub"
 
-		// 1. Generate key if it doesn't exist
 		if _, err := os.Stat(leapKeyPath); os.IsNotExist(err) {
 			fmt.Printf("\n🔑 No Leap SSH key found. Generating a new one at \033[1;36m%s\033[0m...\n", leapKeyPath)
 
 			err := os.MkdirAll(filepath.Dir(leapKeyPath), 0700)
+
 			if err != nil {
 				fmt.Printf("\n❌ Failed to create directory: %v\n", err)
 				return
 			}
 
 			genKey := exec.Command("ssh-keygen", "-t", "ed25519", "-f", leapKeyPath, "-N", "", "-C", "leap-ssh-manager")
+
 			err = genKey.Run()
+
 			if err != nil {
 				fmt.Printf("\n❌ Failed to generate SSH key: %v\n", err)
 				return
@@ -64,16 +69,17 @@ var pushKeyCmd = &cobra.Command{
 		sshCopyId.Stdin = os.Stdin
 
 		err = sshCopyId.Run()
+
 		if err != nil {
 			fmt.Printf("\n❌ Failed to push key: %v\n", err)
 			fmt.Println("\033[90mNote: You might need to enter your password for the last time.\033[0m\n")
 			return
 		}
 
-		// 2. Update connection to use this IdentityFile
 		conn.IdentityFile = leapKeyPath
 		cfg.Connections[name] = conn
 		err = config.SaveConfig(cfg, GetPassphrase())
+
 		if err != nil {
 			fmt.Printf("\n⚠️  Key pushed but failed to update config: %v\n", err)
 		} else {

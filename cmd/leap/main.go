@@ -38,7 +38,6 @@ Features:
 		}
 
 		if len(args) > 0 {
-			// Check if it's a connection name
 			name := strings.Join(args, " ")
 			if conn, ok := cfg.Connections[name]; ok {
 				fmt.Printf("\n🚀 Connecting to \033[1;36m%s\033[0m...\n\n", name)
@@ -46,13 +45,13 @@ Features:
 				return
 			}
 
-			// Try partial match or tag match
 			for _, conn := range cfg.Connections {
 				if strings.Contains(strings.ToLower(conn.Name), strings.ToLower(name)) {
 					fmt.Printf("\n🚀 Connecting to \033[1;36m%s\033[0m...\n\n", conn.Name)
 					ssh.Connect(conn, false)
 					return
 				}
+
 				for _, tag := range conn.Tags {
 					if strings.EqualFold(tag, name) {
 						fmt.Printf("\n🚀 Connecting to \033[1;36m%s\033[0m...\n\n", conn.Name)
@@ -63,8 +62,8 @@ Features:
 			}
 		}
 
-		// Run TUI
 		choice, err := tui.Run(cfg)
+
 		if err != nil {
 			fmt.Printf("\n❌ Error running TUI: %v\n\n", err)
 			return
@@ -79,6 +78,7 @@ Features:
 	},
 }
 
+// Actually no need to but checks future version
 func GetPassphrase() string {
 	return os.Getenv("LEAP_MASTER_PASSWORD")
 }
@@ -86,6 +86,7 @@ func GetPassphrase() string {
 func main() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
+
 		os.Exit(1)
 	}
 }

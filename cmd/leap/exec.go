@@ -16,6 +16,7 @@ var execCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg, err := config.LoadConfig(GetPassphrase())
+
 		if err != nil {
 			fmt.Printf("\n❌ Error loading config: %v\n\n", err)
 			return
@@ -99,16 +100,19 @@ func executeRemoteCommand(conn config.Connection, command string) {
 	sshCmd.Stderr = os.Stderr
 
 	err := sshCmd.Run()
+
 	if err != nil {
 		fmt.Printf("\033[31m✗\033[0m Command failed: %v\n", err)
 	} else {
 		fmt.Printf("\033[32m✓\033[0m Command completed successfully\n")
 	}
+
 	fmt.Println()
 }
 
 func init() {
 	execCmd.Flags().BoolP("all", "a", false, "Execute on all connections")
 	execCmd.Flags().StringP("tag", "t", "", "Execute on connections with specific tag")
+
 	rootCmd.AddCommand(execCmd)
 }

@@ -54,7 +54,6 @@ func LoadConfig(passphrase string) (*Config, error) {
 		return nil, err
 	}
 
-	// Check if data is encrypted with age
 	if bytes.HasPrefix(data, []byte("age-encryption.org")) {
 		if passphrase != "" {
 			decrypted, err := utils.Decrypt(data, passphrase)
@@ -70,6 +69,7 @@ func LoadConfig(passphrase string) (*Config, error) {
 
 	var cfg Config
 	err = yaml.Unmarshal(data, &cfg)
+
 	if err != nil {
 		return nil, err
 	}
@@ -84,24 +84,27 @@ func LoadConfig(passphrase string) (*Config, error) {
 func SaveConfig(cfg *Config, passphrase string) error {
 	path := GetConfigPath()
 	dir := filepath.Dir(path)
+
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		err = os.MkdirAll(dir, 0700)
+
 		if err != nil {
 			return err
 		}
 	}
 
 	data, err := yaml.Marshal(cfg)
+
 	if err != nil {
 		return err
 	}
 
-	// Only encrypt if a passphrase is explicitly provided
 	if passphrase != "" {
 		encrypted, err := utils.Encrypt(data, passphrase)
 		if err != nil {
 			return fmt.Errorf("failed to encrypt config: %v", err)
 		}
+
 		data = encrypted
 	}
 
@@ -121,6 +124,7 @@ func (cfg *Config) DeleteConnection(name string) bool {
 		delete(cfg.Connections, name)
 		return true
 	}
+
 	return false
 }
 
@@ -130,6 +134,7 @@ func (cfg *Config) ToggleFavorite(name string) bool {
 		cfg.Connections[name] = conn
 		return conn.Favorite
 	}
+
 	return false
 }
 
@@ -139,5 +144,6 @@ func (cfg *Config) SetNotes(name, notes string) bool {
 		cfg.Connections[name] = conn
 		return true
 	}
+
 	return false
 }

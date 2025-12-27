@@ -86,7 +86,6 @@ var importSSHCmd = &cobra.Command{
 			}
 		}
 
-		// Final one
 		if currentConn != nil && currentConn.Name != "*" {
 			cfg.Connections[currentConn.Name] = *currentConn
 			fmt.Printf("\033[32m✓\033[0m Added \033[1;36m%s\033[0m (%s)\n", currentConn.Name, currentConn.Host)

@@ -1,5 +1,6 @@
 package main
 
+// This is the best module i think
 import (
 	"encoding/json"
 	"fmt"
@@ -72,12 +73,14 @@ var snapshotCmd = &cobra.Command{
 		includePackages, _ := cmd.Flags().GetBool("packages")
 
 		cfg, err := config.LoadConfig(GetPassphrase())
+
 		if err != nil {
 			fmt.Printf("\n❌ Error loading config: %v\n\n", err)
 			return
 		}
 
 		conn, ok := cfg.Connections[name]
+
 		if !ok {
 			fmt.Printf("\n❌ Connection \033[1;36m%s\033[0m not found.\n\n", name)
 			return
@@ -88,12 +91,14 @@ var snapshotCmd = &cobra.Command{
 		fmt.Printf("  Server: \033[1;36m%s\033[0m (%s@%s)\n\n", name, conn.User, conn.Host)
 
 		snapshot, err := captureSnapshot(conn, name, includePackages)
+
 		if err != nil {
 			fmt.Printf("\n❌ Failed to capture snapshot: %v\n\n", err)
 			return
 		}
 
 		var data []byte
+
 		if format == "yaml" {
 			data, err = yaml.Marshal(snapshot)
 		} else {
@@ -125,7 +130,6 @@ func captureSnapshot(conn config.Connection, name string, includePackages bool) 
 		Timestamp:  time.Now(),
 	}
 
-	// Setup SSH connection
 	sshConfig := &ssh.ClientConfig{
 		User:            conn.User,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
@@ -147,20 +151,19 @@ func captureSnapshot(conn config.Connection, name string, includePackages bool) 
 	}
 
 	addr := fmt.Sprintf("%s:%d", conn.Host, conn.Port)
+
 	client, err := ssh.Dial("tcp", addr, sshConfig)
 	if err != nil {
 		return nil, err
 	}
 	defer client.Close()
 
-	// Gather OS Info
 	fmt.Print("  ⏳ Gathering OS information...")
 	osInfo, _ := runCommand(client, "cat /etc/os-release | grep -E '^(NAME|VERSION)=' | head -2")
 	kernelInfo, _ := runCommand(client, "uname -r")
 	snapshot.OSInfo = parseOSInfo(osInfo, kernelInfo)
 	fmt.Println(" \033[32m✓\033[0m")
 
-	// System Info
 	fmt.Print("  ⏳ Gathering system information...")
 	cpuInfo, _ := runCommand(client, "nproc")
 	ramInfo, _ := runCommand(client, "free -h | awk 'NR==2{print $2,$3}'")
@@ -168,7 +171,6 @@ func captureSnapshot(conn config.Connection, name string, includePackages bool) 
 	snapshot.SystemInfo = parseSystemInfo(cpuInfo, ramInfo, archInfo)
 	fmt.Println(" \033[32m✓\033[0m")
 
-	// Load & Uptime
 	fmt.Print("  ⏳ Gathering load and uptime...")
 	loadAvg, _ := runCommand(client, "cat /proc/loadavg | awk '{print $1,$2,$3}'")
 	uptime, _ := runCommand(client, "uptime -p")
@@ -176,25 +178,21 @@ func captureSnapshot(conn config.Connection, name string, includePackages bool) 
 	snapshot.Uptime = strings.TrimSpace(uptime)
 	fmt.Println(" \033[32m✓\033[0m")
 
-	// Disk Usage
 	fmt.Print("  ⏳ Gathering disk usage...")
 	diskInfo, _ := runCommand(client, "df -h | tail -n +2")
 	snapshot.DiskUsage = parseDiskInfo(diskInfo)
 	fmt.Println(" \033[32m✓\033[0m")
 
-	// Services
 	fmt.Print("  ⏳ Gathering service status...")
 	services, _ := runCommand(client, "systemctl list-units --type=service --state=running --no-pager --no-legend | awk '{print $1}' | head -20")
 	snapshot.Services = parseServices(services)
 	fmt.Println(" \033[32m✓\033[0m")
 
-	// Open Ports
 	fmt.Print("  ⏳ Scanning open ports...")
 	ports, _ := runCommand(client, "ss -tuln | grep LISTEN | awk '{print $5}' | sed 's/.*://' | sort -u")
 	snapshot.OpenPorts = strings.Split(strings.TrimSpace(ports), "\n")
 	fmt.Println(" \033[32m✓\033[0m")
 
-	// Network Info
 	fmt.Print("  ⏳ Gathering network information...")
 	interfaces, _ := runCommand(client, "ip -o link show | awk -F': ' '{print $2}' | grep -v lo")
 	publicIP, _ := runCommand(client, "curl -s ifconfig.me || echo 'N/A'")
@@ -204,11 +202,9 @@ func captureSnapshot(conn config.Connection, name string, includePackages bool) 
 	}
 	fmt.Println(" \033[32m✓\033[0m")
 
-	// Process Count
 	processCount, _ := runCommand(client, "ps aux | wc -l")
 	fmt.Sscanf(processCount, "%d", &snapshot.ProcessCount)
 
-	// Packages (optional, can be slow)
 	if includePackages {
 		fmt.Print("  ⏳ Gathering installed packages (this may take a while)...")
 		packages, _ := runCommand(client, "dpkg -l | grep ^ii | awk '{print $2}' || rpm -qa")
@@ -296,5 +292,6 @@ func init() {
 	snapshotCmd.Flags().StringP("output", "o", "", "Output file path (default: stdout)")
 	snapshotCmd.Flags().StringP("format", "f", "json", "Output format: json or yaml")
 	snapshotCmd.Flags().BoolP("packages", "p", false, "Include installed packages (slower)")
+
 	rootCmd.AddCommand(snapshotCmd)
 }

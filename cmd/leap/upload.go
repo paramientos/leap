@@ -13,21 +13,25 @@ var uploadCmd = &cobra.Command{
 	Use:   "upload [name] [local-path] [remote-path]",
 	Short: "Upload file(s) to remote server",
 	Args:  cobra.ExactArgs(3),
+
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
 		localPath := args[1]
 		remotePath := args[2]
 
 		cfg, err := config.LoadConfig(GetPassphrase())
+
 		if err != nil {
 			fmt.Printf("\n❌ Error loading config: %v\n\n", err)
 			return
 		}
 
 		conn, ok := cfg.Connections[name]
+
 		if !ok {
 			fmt.Printf("\n❌ Connection '\033[1;36m%s\033[0m' not found.\n", name)
 			fmt.Println("\033[90mTip: Use 'leap list' to see all available connections\033[0m\n")
+
 			return
 		}
 
@@ -62,6 +66,7 @@ var uploadCmd = &cobra.Command{
 		scpCmd.Stdin = os.Stdin
 
 		err = scpCmd.Run()
+
 		if err != nil {
 			fmt.Printf("\n❌ Upload failed: %v\n\n", err)
 			return
@@ -112,6 +117,7 @@ var downloadCmd = &cobra.Command{
 		}
 
 		recursive, _ := cmd.Flags().GetBool("recursive")
+
 		if recursive {
 			scpArgs = append(scpArgs, "-r")
 		}
@@ -125,6 +131,7 @@ var downloadCmd = &cobra.Command{
 		scpCmd.Stdin = os.Stdin
 
 		err = scpCmd.Run()
+
 		if err != nil {
 			fmt.Printf("\n❌ Download failed: %v\n\n", err)
 			return

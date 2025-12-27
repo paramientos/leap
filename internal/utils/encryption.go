@@ -32,16 +32,19 @@ func Encrypt(data []byte, passphrase string) ([]byte, error) {
 
 func Decrypt(data []byte, passphrase string) ([]byte, error) {
 	identity, err := age.NewScryptIdentity(passphrase)
+
 	if err != nil {
 		return nil, err
 	}
 
 	r, err := age.Decrypt(bytes.NewReader(data), identity)
+
 	if err != nil {
 		return nil, err
 	}
 
 	out := &bytes.Buffer{}
+
 	if _, err := io.Copy(out, r); err != nil {
 		return nil, err
 	}

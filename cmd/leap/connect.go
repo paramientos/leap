@@ -27,10 +27,11 @@ var connectCmd = &cobra.Command{
 		}
 
 		conn, ok := cfg.Connections[name]
+
 		if !ok {
-			// Try fuzzy match or look for similar names
 			fmt.Printf("\n🔍 Connection '\033[1;36m%s\033[0m' not found. Searching...\n", name)
 			var found bool
+
 			for k, v := range cfg.Connections {
 				if strings.Contains(k, name) {
 					fmt.Printf("\033[32m✓\033[0m Found match: \033[1;36m%s\033[0m. Connecting...\n\n", k)
@@ -39,6 +40,7 @@ var connectCmd = &cobra.Command{
 					break
 				}
 			}
+
 			if !found {
 				fmt.Println("\n❌ No matching connection found.")
 				fmt.Println("\033[90mTip: Use 'leap list' to see all available connections\033[0m\n")
@@ -54,6 +56,7 @@ var connectCmd = &cobra.Command{
 		record, _ := cmd.Flags().GetBool("record")
 
 		err = ssh.Connect(conn, record)
+
 		if err != nil {
 			fmt.Printf("\n❌ SSH Connection closed with error: %v\n\n", err)
 		}
@@ -62,5 +65,6 @@ var connectCmd = &cobra.Command{
 
 func init() {
 	connectCmd.Flags().BoolP("record", "r", false, "Record session")
+
 	rootCmd.AddCommand(connectCmd)
 }

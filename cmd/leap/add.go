@@ -53,6 +53,7 @@ var addCmd = &cobra.Command{
 				return err
 			},
 		}
+
 		portStr, _ := promptPort.Run()
 		port, _ := strconv.Atoi(portStr)
 
@@ -60,18 +61,22 @@ var addCmd = &cobra.Command{
 			Label: "🔐 Password (optional)",
 			Mask:  '*',
 		}
+
 		password, _ := promptPass.Run()
 
 		promptKey := promptui.Prompt{
 			Label: "🔑 SSH Key Path (optional)",
 		}
+
 		key, _ := promptKey.Run()
 
 		promptTags := promptui.Prompt{
 			Label: "🏷️  Tags (comma separated)",
 		}
+
 		tagsStr, _ := promptTags.Run()
 		var tags []string
+
 		if tagsStr != "" {
 			tags = strings.Split(tagsStr, ",")
 			for i := range tags {
@@ -82,6 +87,7 @@ var addCmd = &cobra.Command{
 		promptJump := promptui.Prompt{
 			Label: "🔀 Jump Host (optional)",
 		}
+
 		jump, _ := promptJump.Run()
 
 		promptGroup := promptui.Prompt{
@@ -90,6 +96,7 @@ var addCmd = &cobra.Command{
 		group, _ := promptGroup.Run()
 
 		cfg, err := config.LoadConfig(GetPassphrase())
+
 		if err != nil {
 			fmt.Printf("\n❌ Error loading config: %v\n", err)
 			return

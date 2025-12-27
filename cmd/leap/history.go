@@ -36,7 +36,6 @@ var historyCmd = &cobra.Command{
 		fmt.Println("\n📜 \033[1;32mSESSION RECORDINGS\033[0m")
 		fmt.Println("\033[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
 
-		// Sort by date (filename contains date)
 		sort.Slice(files, func(i, j int) bool {
 			return files[i].Name() > files[j].Name()
 		})
@@ -78,7 +77,6 @@ var replayCmd = &cobra.Command{
 		fmt.Printf("\n\033[1;33m▶ REPLAYING SESSION: %s\033[0m\n", name)
 		fmt.Println("\033[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m\n")
 
-		// For now, just print the content. In a future update, we can add real playback.
 		fmt.Print(string(data))
 
 		fmt.Println("\n\n\033[90m━━━━━━━━━━━━━━━━━━━━ END OF REPLAY ━━━━━━━━━━━━━━━━━━━━\033[0m\n")

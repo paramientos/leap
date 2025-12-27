@@ -108,5 +108,6 @@ func testConnection(conn config.Connection) {
 func init() {
 	testCmd.Flags().BoolP("all", "a", false, "Test all connections")
 	testCmd.Flags().StringP("tag", "t", "", "Test connections with specific tag")
+
 	rootCmd.AddCommand(testCmd)
 }

@@ -31,12 +31,15 @@ func connectWithSystemSSHRecording(cmd *exec.Cmd, recording io.Writer) error {
 			}
 		}
 	}()
+
 	ch <- syscall.SIGWINCH
 
 	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+
 	if err != nil {
 		return err
 	}
+
 	defer term.Restore(int(os.Stdin.Fd()), oldState)
 
 	multi := io.MultiWriter(os.Stdout, recording)
@@ -51,10 +54,13 @@ func connectWithSystemSSHNormal(conn config.Connection) error {
 	if conn.IdentityFile != "" {
 		args = append(args, "-i", conn.IdentityFile)
 	}
+
 	args = append(args, "-p", fmt.Sprintf("%d", conn.Port))
+
 	if conn.JumpHost != "" {
 		args = append(args, "-J", conn.JumpHost)
 	}
+
 	target := fmt.Sprintf("%s@%s", conn.User, conn.Host)
 	args = append(args, target)
 
@@ -62,5 +68,6 @@ func connectWithSystemSSHNormal(conn config.Connection) error {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
 	return cmd.Run()
 }

@@ -26,8 +26,10 @@ var exportCmd = &cobra.Command{
 		switch format {
 		case "json":
 			data, err = json.MarshalIndent(cfg, "", "  ")
+
 		case "yaml":
 			data, err = yaml.Marshal(cfg)
+
 		default:
 			fmt.Printf("\n❌ Unknown format: %s (use 'json' or 'yaml')\n\n", format)
 			return
@@ -41,10 +43,12 @@ var exportCmd = &cobra.Command{
 		if len(args) > 0 {
 			filename := args[0]
 			err = os.WriteFile(filename, data, 0600)
+
 			if err != nil {
 				fmt.Printf("\n❌ Error writing file: %v\n\n", err)
 				return
 			}
+
 			fmt.Printf("\n\033[32m✓\033[0m Exported to \033[1;36m%s\033[0m (%s format)\n\n", filename, format)
 		} else {
 			fmt.Println(string(data))
@@ -86,6 +90,7 @@ var importCmd = &cobra.Command{
 		}
 
 		cfg, err := config.LoadConfig(GetPassphrase())
+
 		if err != nil {
 			fmt.Printf("\n❌ Error loading config: %v\n\n", err)
 			return

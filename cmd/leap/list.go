@@ -22,7 +22,6 @@ var listCmd = &cobra.Command{
 
 		tagFilter, _ := cmd.Flags().GetString("tag")
 
-		// Print header
 		fmt.Println("\n⚡ \033[1;32mLEAP SSH MANAGER\033[0m")
 		fmt.Println("\033[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
 
@@ -32,26 +31,29 @@ var listCmd = &cobra.Command{
 			fmt.Println()
 		}
 
-		// Group connections
 		groups := make(map[string][]config.Connection)
 		for _, conn := range cfg.Connections {
-			// Apply tag filter
 			if tagFilter != "" {
 				found := false
+
 				for _, t := range conn.Tags {
 					if t == tagFilter {
 						found = true
 						break
 					}
 				}
+
 				if !found {
 					continue
 				}
 			}
+
 			groupName := conn.Group
+
 			if groupName == "" {
 				groupName = "Other"
 			}
+
 			groups[groupName] = append(groups[groupName], conn)
 		}
 
@@ -66,6 +68,7 @@ var listCmd = &cobra.Command{
 				connectionStr := fmt.Sprintf("\033[33m%s\033[0m@\033[32m%s\033[0m:\033[35m%d\033[0m", conn.User, conn.Host, conn.Port)
 
 				var tagsStr string
+
 				if len(conn.Tags) > 0 {
 					tagParts := []string{}
 					for _, tag := range conn.Tags {
@@ -77,12 +80,15 @@ var listCmd = &cobra.Command{
 				}
 
 				fmt.Fprintf(w, "  \033[1m%s\033[0m\t%s\t%s\n", conn.Name, connectionStr, tagsStr)
+
 				count++
 			}
+
 			w.Flush()
 		}
 
 		fmt.Println()
+
 		fmt.Printf("\033[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m\n")
 		fmt.Printf("\033[32m✓\033[0m Total connections: \033[1m%d\033[0m\n\n", count)
 	},

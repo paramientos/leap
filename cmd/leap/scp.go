@@ -15,6 +15,7 @@ var scpCmd = &cobra.Command{
 	Long: `Transfer files between local and remote using Leap connection settings.
 Example: leap scp myserver ./file.txt /tmp/`,
 	Args: cobra.MinimumNArgs(1),
+
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
 		cfg, err := config.LoadConfig(GetPassphrase())
@@ -41,9 +42,11 @@ Example: leap scp myserver ./file.txt /tmp/`,
 		fmt.Printf("\n🚀 Transferring \033[1;33m%s\033[0m to \033[1;36m%s:%s\033[0m...\n", src, name, dest)
 
 		scpArgs := []string{"-P", fmt.Sprintf("%d", conn.Port)}
+
 		if conn.IdentityFile != "" {
 			scpArgs = append(scpArgs, "-i", conn.IdentityFile)
 		}
+
 		if conn.JumpHost != "" {
 			scpArgs = append(scpArgs, "-J", conn.JumpHost)
 		}
@@ -56,6 +59,7 @@ Example: leap scp myserver ./file.txt /tmp/`,
 		scpProcess.Stderr = os.Stderr
 
 		err = scpProcess.Run()
+
 		if err != nil {
 			fmt.Printf("\n❌ Transfer failed: %v\n\n", err)
 		} else {
