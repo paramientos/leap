@@ -8,6 +8,8 @@ A modern, beautiful CLI tool to manage your SSH connections with an intuitive te
 ## ✨ Features
 
 - 🔐 **Secure encrypted configuration** - Your main config is safely encrypted
+- 📱 **QR Share** - Share connections via **QR Codes** ⚡
+- ⏺️ **Session Recording** - Record and replay SSH sessions ⏺️
 - 📊 **Real-time Monitoring** - Watch server Load, RAM and Uptime in a live TUI
 - 🔑 **Self-Managed SSH Keys** - Generate and push Leap-specific SSH keys automatically
 - 🏷️ **Tag-based & Group organization** - Organize connections with tags and folders
@@ -15,12 +17,9 @@ A modern, beautiful CLI tool to manage your SSH connections with an intuitive te
 - 🎨 **Beautiful terminal UI** - Modern, colorful interface inspired by Laravel
 - 🔀 **Jump host support** - Connect through bastion hosts
 - 🚇 **SSH tunnel management** - Create and manage SSH tunnels easily
-- ⚡ **Fast and lightweight** - Built with Go for maximum performance
-- ⭐ **Favorites system** - Mark frequently used connections
-- 📝 **Connection notes** - Add notes to your connections
+- 📂 **Smart SCP** - Transfer files using saved connection parameters
 - 🧪 **Health checks** - Test connections and measure latency with visual bars
 - 📤 **Plain-text Export/Import** - Easily backup and share configurations
-- 🖥️ **Remote execution** - Run commands on multiple servers
 - 📁 **SSH Config Import** - Migrate from `~/.ssh/config` in one command
 
 ## 📦 Installation

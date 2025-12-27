@@ -42,7 +42,7 @@ Features:
 			name := strings.Join(args, " ")
 			if conn, ok := cfg.Connections[name]; ok {
 				fmt.Printf("\n🚀 Connecting to \033[1;36m%s\033[0m...\n\n", name)
-				ssh.Connect(conn)
+				ssh.Connect(conn, false)
 				return
 			}
 
@@ -50,13 +50,13 @@ Features:
 			for _, conn := range cfg.Connections {
 				if strings.Contains(strings.ToLower(conn.Name), strings.ToLower(name)) {
 					fmt.Printf("\n🚀 Connecting to \033[1;36m%s\033[0m...\n\n", conn.Name)
-					ssh.Connect(conn)
+					ssh.Connect(conn, false)
 					return
 				}
 				for _, tag := range conn.Tags {
 					if strings.EqualFold(tag, name) {
 						fmt.Printf("\n🚀 Connecting to \033[1;36m%s\033[0m...\n\n", conn.Name)
-						ssh.Connect(conn)
+						ssh.Connect(conn, false)
 						return
 					}
 				}
@@ -71,7 +71,7 @@ Features:
 		}
 
 		if choice != nil {
-			err = ssh.Connect(*choice)
+			err = ssh.Connect(*choice, false)
 			if err != nil {
 				fmt.Printf("\n❌ SSH Connection closed with error: %v\n\n", err)
 			}

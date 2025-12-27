@@ -51,7 +51,9 @@ var connectCmd = &cobra.Command{
 		cfg.UpdateLastUsed(name)
 		config.SaveConfig(cfg, GetPassphrase())
 
-		err = ssh.Connect(conn)
+		record, _ := cmd.Flags().GetBool("record")
+
+		err = ssh.Connect(conn, record)
 		if err != nil {
 			fmt.Printf("\n❌ SSH Connection closed with error: %v\n\n", err)
 		}
@@ -59,5 +61,6 @@ var connectCmd = &cobra.Command{
 }
 
 func init() {
+	connectCmd.Flags().BoolP("record", "r", false, "Record session")
 	rootCmd.AddCommand(connectCmd)
 }

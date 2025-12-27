@@ -2,54 +2,99 @@ package ssh
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"os/signal"
+	"path/filepath"
+	"syscall"
 	"time"
 
+	"github.com/creack/pty"
 	"github.com/paramientos/leap/internal/config"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
 )
 
-func Connect(conn config.Connection) error {
+func Connect(conn config.Connection, record bool) error {
+	var recordingFile *os.File
+	if record {
+		home, _ := os.UserHomeDir()
+		historyDir := filepath.Join(home, ".leap", "history")
+		os.MkdirAll(historyDir, 0700)
+
+		fileName := fmt.Sprintf("%s_%s.cast", conn.Name, time.Now().Format("20060102_150405"))
+		path := filepath.Join(historyDir, fileName)
+
+		f, err := os.Create(path)
+		if err == nil {
+			recordingFile = f
+			defer f.Close()
+			fmt.Printf("\n⏺️  \033[90mRecording session to %s\033[0m\n", path)
+		}
+	}
+
 	// If password is provided, use Go SSH client
 	if conn.Password != "" && conn.IdentityFile == "" {
-		return connectWithPassword(conn)
+		return connectWithPassword(conn, recordingFile)
 	}
 
 	// Fallback to system SSH
-	return connectWithSystemSSH(conn)
+	return connectWithSystemSSH(conn, recordingFile)
 }
 
-func connectWithSystemSSH(conn config.Connection) error {
+func connectWithSystemSSH(conn config.Connection, recording io.Writer) error {
 	args := []string{}
 
-	// Add Identity File
 	if conn.IdentityFile != "" {
 		args = append(args, "-i", conn.IdentityFile)
 	}
-
-	// Add Port
 	args = append(args, "-p", fmt.Sprintf("%d", conn.Port))
-
-	// Add Jump Host
 	if conn.JumpHost != "" {
 		args = append(args, "-J", conn.JumpHost)
 	}
-
-	// Targethost
 	target := fmt.Sprintf("%s@%s", conn.User, conn.Host)
 	args = append(args, target)
 
 	cmd := exec.Command("ssh", args...)
+
+	if recording != nil {
+		ptmx, err := pty.Start(cmd)
+		if err != nil {
+			return err
+		}
+		defer ptmx.Close()
+
+		ch := make(chan os.Signal, 1)
+		signal.Notify(ch, syscall.SIGWINCH)
+		go func() {
+			for range ch {
+				if err := pty.InheritSize(os.Stdin, ptmx); err != nil {
+					fmt.Printf("error resizing pty: %s", err)
+				}
+			}
+		}()
+		ch <- syscall.SIGWINCH
+
+		oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+		if err != nil {
+			panic(err)
+		}
+		defer term.Restore(int(os.Stdin.Fd()), oldState)
+
+		multi := io.MultiWriter(os.Stdout, recording)
+		go func() { io.Copy(ptmx, os.Stdin) }()
+		io.Copy(multi, ptmx)
+		return nil
+	}
+
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-
 	return cmd.Run()
 }
 
-func connectWithPassword(conn config.Connection) error {
+func connectWithPassword(conn config.Connection, recording io.Writer) error {
 	sshConfig := &ssh.ClientConfig{
 		User: conn.User,
 		Auth: []ssh.AuthMethod{
@@ -97,7 +142,11 @@ func connectWithPassword(conn config.Connection) error {
 		}
 	}
 
-	session.Stdout = os.Stdout
+	if recording != nil {
+		session.Stdout = io.MultiWriter(os.Stdout, recording)
+	} else {
+		session.Stdout = os.Stdout
+	}
 	session.Stderr = os.Stderr
 	session.Stdin = os.Stdin
 
