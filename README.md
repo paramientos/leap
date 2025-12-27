@@ -38,36 +38,81 @@ All in a single binary with zero dependencies!
 
 ## 📦 Installation
 
+### Quick Install (Recommended)
+
+**Linux / macOS:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/paramientos/leap/main/install.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/paramientos/leap/main/install.ps1 | iex
+```
+
 ### Download Pre-built Binaries
 
-Download the latest release for your platform from [GitHub Releases](https://github.com/paramientos/leap/releases):
+Download the latest release for your platform from [GitHub Releases](https://github.com/paramientos/leap/releases/latest):
 
-- **Linux (AMD64/ARM64)**
-- **macOS (Intel/Apple Silicon)**
-- **Windows (AMD64/ARM64)**
+**Available Platforms:**
+- 🐧 Linux (AMD64, ARM64)
+- 🍎 macOS (Intel, Apple Silicon)
+- 🪟 Windows (AMD64, ARM64)
 
+**Manual Installation:**
+
+**Linux / macOS:**
 ```bash
-# Extract and install (Linux/macOS)
-tar -xzf leap-*.tar.gz
-sudo mv leap /usr/local/bin/
+# Download (replace VERSION and PLATFORM)
+wget https://github.com/paramientos/leap/releases/latest/download/leap-VERSION-PLATFORM.tar.gz
 
-# Make executable
+# Extract
+tar -xzf leap-VERSION-PLATFORM.tar.gz
+
+# Install
+sudo mv leap-PLATFORM /usr/local/bin/leap
 chmod +x /usr/local/bin/leap
+
+# Verify
+leap --version
+```
+
+**Windows:**
+```powershell
+# Download from releases page
+# Extract the ZIP file
+# Move leap.exe to a directory in your PATH
+# Or add the directory to your PATH
 ```
 
 ### Build from Source
 
+**Prerequisites:**
+- Go 1.24 or higher
+- Make (optional, but recommended)
+
+**Using Makefile:**
 ```bash
 git clone https://github.com/paramientos/leap.git
 cd leap
 
-# Using Makefile (recommended)
-make build          # Build for current platform
-make install        # Build and install to /usr/local/bin
-make build-all      # Build for all platforms
-make release        # Create release archives
+# Build for current platform
+make build
 
-# Or using Go directly
+# Install to /usr/local/bin
+make install
+
+# Build for all platforms
+make build-all
+
+# Create release archives
+make release
+```
+
+**Using Go directly:**
+```bash
+git clone https://github.com/paramientos/leap.git
+cd leap
 go build -o leap ./cmd/leap
 sudo mv leap /usr/local/bin/
 ```
@@ -76,6 +121,19 @@ sudo mv leap /usr/local/bin/
 
 ```bash
 go install github.com/paramientos/leap/cmd/leap@latest
+```
+
+**Note:** This installs to `$GOPATH/bin` (usually `~/go/bin`). Make sure it's in your PATH.
+
+### Verify Installation
+
+```bash
+leap --version
+```
+
+You should see:
+```
+⚡ LEAP SSH Manager v0.6.0
 ```
 
 ## 🚀 Quick Start
