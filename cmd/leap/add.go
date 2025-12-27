@@ -35,7 +35,7 @@ var addCmd = &cobra.Command{
 		}
 
 		promptHost := promptui.Prompt{
-			Label: "🌐 Hostname",
+			Label: "🌐 Hostname/IP",
 		}
 		host, _ := promptHost.Run()
 
@@ -84,6 +84,11 @@ var addCmd = &cobra.Command{
 		}
 		jump, _ := promptJump.Run()
 
+		promptGroup := promptui.Prompt{
+			Label: "📁 Group/Folder (optional)",
+		}
+		group, _ := promptGroup.Run()
+
 		cfg, err := config.LoadConfig(GetPassphrase())
 		if err != nil {
 			fmt.Printf("\n❌ Error loading config: %v\n", err)
@@ -99,6 +104,7 @@ var addCmd = &cobra.Command{
 			IdentityFile: key,
 			Tags:         tags,
 			JumpHost:     jump,
+			Group:        group,
 			CreatedAt:    time.Now(),
 		}
 

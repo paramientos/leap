@@ -196,21 +196,15 @@ database      admin@db.example.com:22       #prod #database
 LEAP stores your connections in a configuration file at:
 - macOS/Linux/Windows: `~/.leap/connections.yaml`
 
-### Encryption
+### Encryption (Optional)
 
-Connections are automatically encrypted using the [age](https://github.com/FiloSottile/age) encryption format if you have a master password set.
-
-Set a master password using the `LEAP_MASTER_PASSWORD` environment variable. You can set it globally in your `~/.zshrc` or `~/.bashrc`:
+By default, LEAP stores your connections in plain-text YAML. If you want to encrypt your configuration file, set a master password using the `LEAP_MASTER_PASSWORD` environment variable:
 
 ```bash
 export LEAP_MASTER_PASSWORD="your-secure-password"
 ```
 
-Or provide it temporarily for a single command:
-
-```bash
-LEAP_MASTER_PASSWORD="your-secure-password" leap list
-```
+If set, your configuration will be automatically encrypted using the [age](https://github.com/FiloSottile/age) format.
 
 ## 📖 Usage Examples
 

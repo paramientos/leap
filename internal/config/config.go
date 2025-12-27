@@ -25,6 +25,7 @@ type Connection struct {
 	Favorite     bool      `yaml:"favorite,omitempty"`
 	Notes        string    `yaml:"notes,omitempty"`
 	UsageCount   int       `yaml:"usage_count,omitempty"`
+	Group        string    `yaml:"group,omitempty"`
 	CreatedAt    time.Time `yaml:"created_at,omitempty"`
 }
 
@@ -54,30 +55,16 @@ func LoadConfig(passphrase string) (*Config, error) {
 	}
 
 	// Check if data is encrypted with age
-	isEncrypted := bytes.HasPrefix(data, []byte("age-encryption.org"))
-
-	if isEncrypted {
-		if passphrase == "" {
-			return nil, fmt.Errorf("config is encrypted but LEAP_MASTER_PASSWORD is not set")
-		}
-		decrypted, err := utils.Decrypt(data, passphrase)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decrypt config: %v (check your master password)", err)
-		}
-		data = decrypted
-	} else if passphrase != "" {
-		// Data is not encrypted but a passphrase is set
-		// Encrypt it immediately to ensure security
-		fmt.Printf("\n🔒 Encrypting your configuration file...\n")
-		var cfg Config
-		err = yaml.Unmarshal(data, &cfg)
-		if err == nil {
-			err = SaveConfig(&cfg, passphrase)
-			if err != nil {
-				fmt.Printf("⚠️  Failed to encrypt config: %v\n", err)
+	if bytes.HasPrefix(data, []byte("age-encryption.org")) {
+		if passphrase != "" {
+			decrypted, err := utils.Decrypt(data, passphrase)
+			if err == nil {
+				data = decrypted
 			} else {
-				fmt.Printf("✅ Config encrypted successfully.\n")
+				return nil, fmt.Errorf("config is encrypted but decryption failed (wrong password)")
 			}
+		} else {
+			return nil, fmt.Errorf("config is encrypted but LEAP_MASTER_PASSWORD is not set")
 		}
 	}
 
@@ -109,6 +96,7 @@ func SaveConfig(cfg *Config, passphrase string) error {
 		return err
 	}
 
+	// Only encrypt if a passphrase is explicitly provided
 	if passphrase != "" {
 		encrypted, err := utils.Encrypt(data, passphrase)
 		if err != nil {
