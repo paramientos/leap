@@ -91,5 +91,6 @@ func main() {
 }
 
 func init() {
-	// Root flags if any
+	rootCmd.Version = Version
+	rootCmd.SetVersionTemplate("⚡ LEAP SSH Manager v{{.Version}}\n")
 }
