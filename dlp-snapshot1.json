@@ -1,0 +1,186 @@
+{
+  "server_name": "dlp",
+  "host": "188.245.212.15",
+  "timestamp": "2025-12-27T17:45:09.678133+03:00",
+  "os_info": {
+    "distribution": "Ubuntu",
+    "version": "24.04.3 LTS (Noble Numbat)",
+    "kernel": "6.8.0-90-generic"
+  },
+  "system_info": {
+    "cpu_cores": "4",
+    "total_ram": "7.6Gi",
+    "used_ram": "1.2Gi",
+    "architecture": "x86_64"
+  },
+  "services": [
+    {
+      "name": "atd.service",
+      "status": "running"
+    },
+    {
+      "name": "containerd.service",
+      "status": "running"
+    },
+    {
+      "name": "cron.service",
+      "status": "running"
+    },
+    {
+      "name": "dbus.service",
+      "status": "running"
+    },
+    {
+      "name": "docker.service",
+      "status": "running"
+    },
+    {
+      "name": "getty@tty1.service",
+      "status": "running"
+    },
+    {
+      "name": "multipathd.service",
+      "status": "running"
+    },
+    {
+      "name": "nginx.service",
+      "status": "running"
+    },
+    {
+      "name": "php8.4-fpm.service",
+      "status": "running"
+    },
+    {
+      "name": "polkit.service",
+      "status": "running"
+    },
+    {
+      "name": "qemu-guest-agent.service",
+      "status": "running"
+    },
+    {
+      "name": "rsyslog.service",
+      "status": "running"
+    },
+    {
+      "name": "serial-getty@ttyS0.service",
+      "status": "running"
+    },
+    {
+      "name": "snapd.service",
+      "status": "running"
+    },
+    {
+      "name": "ssh.service",
+      "status": "running"
+    },
+    {
+      "name": "systemd-journald.service",
+      "status": "running"
+    },
+    {
+      "name": "systemd-logind.service",
+      "status": "running"
+    },
+    {
+      "name": "systemd-networkd.service",
+      "status": "running"
+    },
+    {
+      "name": "systemd-resolved.service",
+      "status": "running"
+    },
+    {
+      "name": "systemd-timesyncd.service",
+      "status": "running"
+    }
+  ],
+  "open_ports": [
+    "22",
+    "443",
+    "53",
+    "5555",
+    "6379",
+    "7545",
+    "80"
+  ],
+  "disk_usage": [
+    {
+      "filesystem": "tmpfs",
+      "size": "776M",
+      "used": "1.4M",
+      "available": "774M",
+      "use_percent": "1%",
+      "mount_point": "/run"
+    },
+    {
+      "filesystem": "/dev/sda1",
+      "size": "75G",
+      "used": "6.4G",
+      "available": "66G",
+      "use_percent": "9%",
+      "mount_point": "/"
+    },
+    {
+      "filesystem": "tmpfs",
+      "size": "3.8G",
+      "used": "0",
+      "available": "3.8G",
+      "use_percent": "0%",
+      "mount_point": "/dev/shm"
+    },
+    {
+      "filesystem": "tmpfs",
+      "size": "5.0M",
+      "used": "0",
+      "available": "5.0M",
+      "use_percent": "0%",
+      "mount_point": "/run/lock"
+    },
+    {
+      "filesystem": "/dev/sda15",
+      "size": "253M",
+      "used": "146K",
+      "available": "252M",
+      "use_percent": "1%",
+      "mount_point": "/boot/efi"
+    },
+    {
+      "filesystem": "tmpfs",
+      "size": "776M",
+      "used": "12K",
+      "available": "776M",
+      "use_percent": "1%",
+      "mount_point": "/run/user/0"
+    },
+    {
+      "filesystem": "overlay",
+      "size": "75G",
+      "used": "6.4G",
+      "available": "66G",
+      "use_percent": "9%",
+      "mount_point": "/var/lib/docker/rootfs/overlayfs/aab674da5c6aa91c0fbbbce77faae71a8b070fc40329b7500a14ca2f012e955c"
+    },
+    {
+      "filesystem": "overlay",
+      "size": "75G",
+      "used": "6.4G",
+      "available": "66G",
+      "use_percent": "9%",
+      "mount_point": "/var/lib/docker/rootfs/overlayfs/1b432b459f7ffaf27f62cd1ac80de142da2989eeb7748e2828bdf8941f1f38ff"
+    }
+  ],
+  "network_info": {
+    "interfaces": [
+      "eth0",
+      "docker0",
+      "br-f4b7a919c0a7",
+      "vethea8d873@if2",
+      "veth9ce8dfb@if2"
+    ],
+    "public_ip": "\u003chtml\u003e\u003chead\u003e\n\u003cmeta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\"\u003e\n\u003ctitle\u003e403 Forbidden\u003c/title\u003e\n\u003c/head\u003e\n\u003cbody text=#000000 bgcolor=#ffffff\u003e\n\u003ch1\u003eError: Forbidden\u003c/h1\u003e\n\u003ch2\u003eYour client does not have permission to get URL \u003ccode\u003e/\u003c/code\u003e from this server.\u003c/h2\u003e\n\u003ch2\u003e\u003c/h2\u003e\n\u003c/body\u003e\u003c/html\u003e"
+  },
+  "process_count": 180,
+  "load_average": "0.27 0.18 0.11",
+  "uptime": "up 2 days, 4 hours, 11 minutes"
+}

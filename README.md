@@ -1,13 +1,29 @@
 # ⚡ LEAP SSH Manager
 
-A modern, beautiful CLI tool to manage your SSH connections with an intuitive terminal interface inspired by Laravel's elegant design.
+**The Ultimate SSH Connection Manager** - A modern, feature-rich CLI tool that goes beyond simple SSH management. Monitor servers in real-time, capture snapshots, share connections via QR codes, record sessions, and manage everything from a beautiful web dashboard or terminal UI.
+
+Built with Go for maximum performance. Inspired by Laravel's elegant design philosophy.
 
 ![LEAP SSH Manager](https://img.shields.io/badge/Go-1.24+-00ADD8?style=for-the-badge&logo=go)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
+## 🎯 Why LEAP?
+
+LEAP isn't just another SSH manager - it's a complete DevOps command center:
+- 📸 **Snapshot & Compare** servers to track changes over time
+- 🌐 **Web Dashboard** for managing connections from any device
+- 📱 **QR Code Sharing** for instant connection distribution
+- ⏺️ **Session Recording** for documentation and auditing
+- 📊 **Live Monitoring** of server resources in beautiful TUIs
+- 🔑 **Automated Key Management** with one-command setup
+
+All in a single binary with zero dependencies!
+
 ## ✨ Features
 
 - 🔐 **Secure encrypted configuration** - Your main config is safely encrypted
+- 📸 **Server Snapshots** - Capture complete server state (OS, packages, services, ports)
+- 🌐 **Web Dashboard** - Manage connections from your browser with a beautiful UI
 - 📱 **QR Share** - Share connections via **QR Codes** ⚡
 - ⏺️ **Session Recording** - Record and replay SSH sessions ⏺️
 - 📊 **Real-time Monitoring** - Watch server Load, RAM and Uptime in a live TUI
@@ -145,6 +161,76 @@ leap download myserver /remote/folder/ ./ --recursive
 ```
 
 ### Export/Import
+
+### Server Snapshots
+
+Capture and compare complete server states for change tracking and auditing.
+
+```bash
+# Capture a snapshot
+leap snapshot myserver -o snapshot.json
+
+# Capture with installed packages (slower)
+leap snapshot myserver -o snapshot.json --packages
+
+# Compare two snapshots
+leap diff snapshot1.json snapshot2.json
+
+# YAML format
+leap snapshot myserver -f yaml -o snapshot.yaml
+```
+
+### Web Dashboard
+
+Launch a beautiful web interface to manage your connections from any device.
+
+```bash
+# Start web server (default port 8080)
+leap web
+
+# Custom port
+leap web --port 3000
+
+# Then open http://localhost:8080 in your browser
+```
+
+### Share Connections
+
+Share connection details via QR code or encrypted short-codes.
+
+```bash
+# Generate QR code and share code
+leap share myserver
+
+# Receiver imports with:
+leap import-code [base64-code]
+```
+
+### Session Recording
+
+Record and replay SSH sessions for documentation or auditing.
+
+```bash
+# Record a session
+leap connect myserver --record
+
+# List recordings
+leap history
+
+# Replay a session
+leap replay myserver_20231227_153045
+```
+
+### File Transfer
+
+Transfer files using your saved connection settings.
+
+```bash
+# Upload file
+leap scp myserver ./local-file.txt /remote/path/
+
+# The command automatically uses your saved port, keys, and jump hosts
+```
 
 ### Health & Monitoring
 
