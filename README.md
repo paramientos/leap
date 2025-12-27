@@ -1,6 +1,6 @@
 # ⚡ LEAP SSH Manager
 
-**The Ultimate SSH Connection Manager** - A modern, feature-rich CLI tool that goes beyond simple SSH management. Monitor servers in real-time, capture snapshots, share connections via QR codes, record sessions, and manage everything from a beautiful web dashboard or terminal UI.
+**The Ultimate SSH Connection Manager** - A modern, feature-rich CLI tool that goes beyond simple SSH management. Monitor servers in real-time, capture snapshots, share connections via QR codes, record sessions, and manage everything from a beautiful terminal UI.
 
 Built with Go for maximum performance. Inspired by Laravel's elegant design philosophy.
 
@@ -11,7 +11,6 @@ Built with Go for maximum performance. Inspired by Laravel's elegant design phil
 
 LEAP isn't just another SSH manager - it's a complete DevOps command center:
 - 📸 **Snapshot & Compare** servers to track changes over time
-- 🌐 **Web Dashboard** for managing connections from any device
 - 📱 **QR Code Sharing** for instant connection distribution
 - ⏺️ **Session Recording** for documentation and auditing
 - 📊 **Live Monitoring** of server resources in beautiful TUIs
@@ -23,7 +22,6 @@ All in a single binary with zero dependencies!
 
 - 🔐 **Secure encrypted configuration** - Your main config is safely encrypted
 - 📸 **Server Snapshots** - Capture complete server state (OS, packages, services, ports)
-- 🌐 **Web Dashboard** - Manage connections from your browser with a beautiful UI
 - 📱 **QR Share** - Share connections via **QR Codes** ⚡
 - ⏺️ **Session Recording** - Record and replay SSH sessions ⏺️
 - 📊 **Real-time Monitoring** - Watch server Load, RAM and Uptime in a live TUI
@@ -178,20 +176,6 @@ leap diff snapshot1.json snapshot2.json
 
 # YAML format
 leap snapshot myserver -f yaml -o snapshot.yaml
-```
-
-### Web Dashboard
-
-Launch a beautiful web interface to manage your connections from any device.
-
-```bash
-# Start web server (default port 8080)
-leap web
-
-# Custom port
-leap web --port 3000
-
-# Then open http://localhost:8080 in your browser
 ```
 
 ### Share Connections
