@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -52,12 +53,32 @@ func LoadConfig(passphrase string) (*Config, error) {
 		return nil, err
 	}
 
-	if passphrase != "" {
+	// Check if data is encrypted with age
+	isEncrypted := bytes.HasPrefix(data, []byte("age-encryption.org"))
+
+	if isEncrypted {
+		if passphrase == "" {
+			return nil, fmt.Errorf("config is encrypted but LEAP_MASTER_PASSWORD is not set")
+		}
 		decrypted, err := utils.Decrypt(data, passphrase)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decrypt config: %v (check your master password)", err)
 		}
 		data = decrypted
+	} else if passphrase != "" {
+		// Data is not encrypted but a passphrase is set
+		// Encrypt it immediately to ensure security
+		fmt.Printf("\n🔒 Encrypting your configuration file...\n")
+		var cfg Config
+		err = yaml.Unmarshal(data, &cfg)
+		if err == nil {
+			err = SaveConfig(&cfg, passphrase)
+			if err != nil {
+				fmt.Printf("⚠️  Failed to encrypt config: %v\n", err)
+			} else {
+				fmt.Printf("✅ Config encrypted successfully.\n")
+			}
+		}
 	}
 
 	var cfg Config

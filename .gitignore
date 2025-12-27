@@ -19,4 +19,4 @@ go.work.sum
 vendor/
 
 .DS_Store
-leap
+/leap

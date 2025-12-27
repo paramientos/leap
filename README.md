@@ -7,7 +7,7 @@ A modern, beautiful CLI tool to manage your SSH connections with an intuitive te
 
 ## ✨ Features
 
-- 🔐 **Secure encrypted configuration** - Your credentials are safely encrypted
+- 🔐 **Secure encrypted configuration** - Your main config is safely encrypted
 - 🏷️ **Tag-based organization** - Organize connections with custom tags
 - 🔍 **Fuzzy search & filtering** - Find connections quickly
 - 🎨 **Beautiful terminal UI** - Modern, colorful interface inspired by Laravel
@@ -17,7 +17,7 @@ A modern, beautiful CLI tool to manage your SSH connections with an intuitive te
 - ⭐ **Favorites system** - Mark frequently used connections
 - 📝 **Connection notes** - Add notes to your connections
 - 🧪 **Health checks** - Test connections and measure latency
-- 📤 **Export/Import** - Backup and share configurations
+- 📤 **Plain-text Export/Import** - Easily backup and share configurations
 - 🖥️ **Remote execution** - Run commands on multiple servers
 - 📁 **File transfer** - Upload/download files via SCP
 - ✏️ **Edit connections** - Update existing connections easily
@@ -147,12 +147,16 @@ leap download myserver /remote/folder/ ./ --recursive
 
 ### Export/Import
 
+### Export/Import
+
+Backup or share your connections in JSON or YAML format. Note that items are exported in **plain-text** for easy sharing and manual editing.
+
 ```bash
-# Export
+# Export (Decrypted output)
 leap export backup.json
 leap export backup.yaml --format yaml
 
-# Import
+# Import (Reads plain-text)
 leap import backup.json
 leap import backup.yaml --merge  # Update existing
 ```
@@ -189,19 +193,24 @@ database      admin@db.example.com:22       #prod #database
 
 ## 🔧 Configuration
 
-LEAP stores your connections in an encrypted configuration file at:
-- macOS/Linux: `~/.config/leap/config.yaml.enc`
-- Windows: `%APPDATA%\leap\config.yaml.enc`
+LEAP stores your connections in a configuration file at:
+- macOS/Linux/Windows: `~/.leap/connections.yaml`
 
 ### Encryption
 
-Set a master password using the `LEAP_MASTER_PASSWORD` environment variable:
+Connections are automatically encrypted using the [age](https://github.com/FiloSottile/age) encryption format if you have a master password set.
+
+Set a master password using the `LEAP_MASTER_PASSWORD` environment variable. You can set it globally in your `~/.zshrc` or `~/.bashrc`:
 
 ```bash
 export LEAP_MASTER_PASSWORD="your-secure-password"
 ```
 
-Add this to your `~/.bashrc`, `~/.zshrc`, or equivalent.
+Or provide it temporarily for a single command:
+
+```bash
+LEAP_MASTER_PASSWORD="your-secure-password" leap list
+```
 
 ## 📖 Usage Examples
 
