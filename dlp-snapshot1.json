@@ -1,7 +1,7 @@
 {
   "server_name": "dlp",
   "host": "188.245.212.15",
-  "timestamp": "2025-12-27T17:45:09.678133+03:00",
+  "timestamp": "2025-12-28T20:27:54.438053+03:00",
   "os_info": {
     "distribution": "Ubuntu",
     "version": "24.04.3 LTS (Noble Numbat)",
@@ -10,7 +10,7 @@
   "system_info": {
     "cpu_cores": "4",
     "total_ram": "7.6Gi",
-    "used_ram": "1.2Gi",
+    "used_ram": "1.3Gi",
     "architecture": "x86_64"
   },
   "services": [
@@ -116,9 +116,9 @@
     {
       "filesystem": "/dev/sda1",
       "size": "75G",
-      "used": "6.4G",
-      "available": "66G",
-      "use_percent": "9%",
+      "used": "6.8G",
+      "available": "65G",
+      "use_percent": "10%",
       "mount_point": "/"
     },
     {
@@ -156,17 +156,17 @@
     {
       "filesystem": "overlay",
       "size": "75G",
-      "used": "6.4G",
-      "available": "66G",
-      "use_percent": "9%",
+      "used": "6.8G",
+      "available": "65G",
+      "use_percent": "10%",
       "mount_point": "/var/lib/docker/rootfs/overlayfs/aab674da5c6aa91c0fbbbce77faae71a8b070fc40329b7500a14ca2f012e955c"
     },
     {
       "filesystem": "overlay",
       "size": "75G",
-      "used": "6.4G",
-      "available": "66G",
-      "use_percent": "9%",
+      "used": "6.8G",
+      "available": "65G",
+      "use_percent": "10%",
       "mount_point": "/var/lib/docker/rootfs/overlayfs/1b432b459f7ffaf27f62cd1ac80de142da2989eeb7748e2828bdf8941f1f38ff"
     }
   ],
@@ -180,7 +180,7 @@
     ],
     "public_ip": "\u003chtml\u003e\u003chead\u003e\n\u003cmeta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\"\u003e\n\u003ctitle\u003e403 Forbidden\u003c/title\u003e\n\u003c/head\u003e\n\u003cbody text=#000000 bgcolor=#ffffff\u003e\n\u003ch1\u003eError: Forbidden\u003c/h1\u003e\n\u003ch2\u003eYour client does not have permission to get URL \u003ccode\u003e/\u003c/code\u003e from this server.\u003c/h2\u003e\n\u003ch2\u003e\u003c/h2\u003e\n\u003c/body\u003e\u003c/html\u003e"
   },
-  "process_count": 180,
-  "load_average": "0.27 0.18 0.11",
-  "uptime": "up 2 days, 4 hours, 11 minutes"
+  "process_count": 175,
+  "load_average": "0.09 0.09 0.09",
+  "uptime": "up 3 days, 6 hours, 54 minutes"
 }

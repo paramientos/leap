@@ -21,7 +21,7 @@ func connectWithSystemSSHRecording(cmd *exec.Cmd, recording io.Writer) error {
 }
 
 func connectWithSystemSSHNormal(conn config.Connection) error {
-	args := []string{}
+	args := []string{"-t"} // Force pseudo-terminal allocation
 
 	if conn.IdentityFile != "" {
 		args = append(args, "-i", conn.IdentityFile)
