@@ -3,11 +3,15 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
+	"github.com/manifoldco/promptui"
 	"github.com/paramientos/leap/internal/config"
 	"github.com/paramientos/leap/internal/ssh"
 	"github.com/paramientos/leap/internal/tui"
+	"github.com/paramientos/leap/internal/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -87,15 +91,104 @@ Features:
 	},
 }
 
-// Actually no need to but checks future version
+var masterPassword string
+
 func GetPassphrase() string {
-	return os.Getenv("LEAP_MASTER_PASSWORD")
+	if masterPassword != "" {
+		return masterPassword
+	}
+
+	envPass := os.Getenv("LEAP_MASTER_PASSWORD")
+	if envPass != "" {
+		masterPassword = envPass
+		return masterPassword
+	}
+
+	home, _ := os.UserHomeDir()
+	sessionFile := filepath.Join(home, ".leap", ".session")
+	hostname, _ := os.Hostname()
+	salt := hostname + home // Unique to this machine and user
+
+	// Check for active session (5 minute cache)
+	if info, err := os.Stat(sessionFile); err == nil {
+		if time.Since(info.ModTime()) < 5*time.Minute {
+			data, err := os.ReadFile(sessionFile)
+			if err == nil {
+				decrypted, err := utils.Deobfuscate(data, salt)
+				if err == nil {
+					masterPassword = string(decrypted)
+					// Refresh the session timeout on each use
+					os.Chtimes(sessionFile, time.Now(), time.Now())
+					return masterPassword
+				} else {
+					// File exists but is not valid obfuscated data (maybe old plaintext)
+					// Delete it to be safe
+					os.Remove(sessionFile)
+				}
+			}
+		} else {
+			// Session expired
+			os.Remove(sessionFile)
+		}
+	}
+
+	path := config.GetConfigPath()
+	isFirstRun := false
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		isFirstRun = true
+	}
+
+	if isFirstRun {
+		fmt.Println("\n✨ \033[1;32mWelcome to LEAP SSH Manager!\033[0m")
+		fmt.Println("This is your first run. Let's set up a \033[1mMaster Password\033[0m to encrypt your connections.")
+		fmt.Println("\033[90mNote: You can avoid this prompt by setting LEAP_MASTER_PASSWORD environment variable.\033[0m")
+
+		prompt := promptui.Prompt{
+			Label: "🔒 Set Master Password",
+			Mask:  '*',
+			Validate: func(input string) error {
+				if len(input) < 4 {
+					return fmt.Errorf("password must be at least 4 characters")
+				}
+				return nil
+			},
+		}
+		res, err := prompt.Run()
+		if err != nil {
+			os.Exit(1)
+		}
+		masterPassword = res
+
+		cfg := &config.Config{Connections: make(map[string]config.Connection)}
+		err = config.SaveConfig(cfg, masterPassword)
+		if err != nil {
+			fmt.Printf("❌ Failed to initialize config: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("\033[32m✓ Master Password set and config initialized.\033[0m")
+	} else {
+		prompt := promptui.Prompt{
+			Label: "🔓 Enter Master Password",
+			Mask:  '*',
+		}
+		res, err := prompt.Run()
+		if err != nil {
+			os.Exit(1)
+		}
+		masterPassword = res
+	}
+
+	// Save to session cache (600 permissions - user only)
+	encrypted, err := utils.Obfuscate([]byte(masterPassword), salt)
+	if err == nil {
+		os.WriteFile(sessionFile, encrypted, 0600)
+	}
+
+	return masterPassword
 }
 
 func main() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-
 		os.Exit(1)
 	}
 }

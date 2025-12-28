@@ -54,22 +54,22 @@ func LoadConfig(passphrase string) (*Config, error) {
 		return nil, err
 	}
 
+	// Always expect encryption with "age"
 	if bytes.HasPrefix(data, []byte("age-encryption.org")) {
-		if passphrase != "" {
-			decrypted, err := utils.Decrypt(data, passphrase)
-			if err == nil {
-				data = decrypted
-			} else {
-				return nil, fmt.Errorf("config is encrypted but decryption failed (wrong password)")
-			}
-		} else {
-			return nil, fmt.Errorf("config is encrypted but LEAP_MASTER_PASSWORD is not set")
+		if passphrase == "" {
+			return nil, fmt.Errorf("PassphraseRequired")
 		}
+		decrypted, err := utils.Decrypt(data, passphrase)
+		if err != nil {
+			return nil, fmt.Errorf("invalid master password")
+		}
+		data = decrypted
+	} else {
+		// Migration: If file is not encrypted yet, we will encrypt it on next save
 	}
 
 	var cfg Config
 	err = yaml.Unmarshal(data, &cfg)
-
 	if err != nil {
 		return nil, err
 	}
@@ -82,31 +82,31 @@ func LoadConfig(passphrase string) (*Config, error) {
 }
 
 func SaveConfig(cfg *Config, passphrase string) error {
+	if passphrase == "" {
+		return fmt.Errorf("master password is required to save configuration")
+	}
+
 	path := GetConfigPath()
 	dir := filepath.Dir(path)
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		err = os.MkdirAll(dir, 0700)
-
 		if err != nil {
 			return err
 		}
 	}
 
 	data, err := yaml.Marshal(cfg)
-
 	if err != nil {
 		return err
 	}
 
-	if passphrase != "" {
-		encrypted, err := utils.Encrypt(data, passphrase)
-		if err != nil {
-			return fmt.Errorf("failed to encrypt config: %v", err)
-		}
-
-		data = encrypted
+	// ALWAYS ENCRYPT
+	encrypted, err := utils.Encrypt(data, passphrase)
+	if err != nil {
+		return fmt.Errorf("failed to encrypt config: %v", err)
 	}
+	data = encrypted
 
 	return os.WriteFile(path, data, 0600)
 }
