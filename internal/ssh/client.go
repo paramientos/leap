@@ -5,10 +5,7 @@ import (
 	"io"
 	"net"
 	"os"
-	"os/exec"
-	"os/signal"
 	"path/filepath"
-	"syscall"
 	"time"
 
 	"github.com/paramientos/leap/internal/config"
@@ -19,32 +16,12 @@ import (
 
 func Connect(conn config.Connection, record bool) error {
 	// If password exists, we MUST use native to auto-fill it
-	// If it's a key-only connection, syscall.Exec is better (more stable)
+	// If it's a key-only connection, system SSH via syscall.Exec (on Unix) is better
 	if conn.Password != "" || record {
 		return connectNative(conn, record)
 	}
 
 	return connectWithSystemSSH(conn)
-}
-
-func connectWithSystemSSH(conn config.Connection) error {
-	binary, err := exec.LookPath("ssh")
-	if err != nil {
-		binary = "/usr/bin/ssh"
-	}
-
-	args := []string{"ssh", "-t"}
-	if conn.IdentityFile != "" {
-		args = append(args, "-i", conn.IdentityFile)
-	}
-	args = append(args, "-p", fmt.Sprintf("%d", conn.Port))
-	if conn.JumpHost != "" {
-		args = append(args, "-J", conn.JumpHost)
-	}
-	target := fmt.Sprintf("%s@%s", conn.User, conn.Host)
-	args = append(args, target)
-
-	return syscall.Exec(binary, args, os.Environ())
 }
 
 func connectNative(conn config.Connection, record bool) error {
@@ -119,19 +96,11 @@ func connectNative(conn config.Connection, record bool) error {
 			return err
 		}
 
-		// Handle window resize signals
-		sig := make(chan os.Signal, 1)
-		signal.Notify(sig, syscall.SIGWINCH)
-		defer signal.Stop(sig)
-		go func() {
-			for range sig {
-				nw, nh, _ := term.GetSize(fd)
-				session.WindowChange(nh, nw)
-			}
-		}()
+		// Handle window resize signals (Platform specific)
+		setupWindowResizeHandler(fd, session)
 	}
 
-	// PIPING - Donma sorununu çözen asıl kısım
+	// PIPING
 	stdin, _ := session.StdinPipe()
 	stdout, _ := session.StdoutPipe()
 	stderr, _ := session.StderrPipe()
@@ -143,7 +112,6 @@ func connectNative(conn config.Connection, record bool) error {
 		logout = io.MultiWriter(os.Stdout, recordingFile)
 	}
 
-	// Goroutines for output
 	go io.Copy(logout, stdout)
 	go io.Copy(os.Stderr, stderr)
 
