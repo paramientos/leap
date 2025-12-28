@@ -55,9 +55,9 @@ irm https://raw.githubusercontent.com/paramientos/leap/main/install.ps1 | iex
 Download the latest release for your platform from [GitHub Releases](https://github.com/paramientos/leap/releases/latest):
 
 **Available Platforms:**
-- 🐧 Linux (AMD64, ARM64)
-- 🍎 macOS (Intel, Apple Silicon)
-- 🪟 Windows (AMD64, ARM64)
+- Linux (AMD64, ARM64)
+- macOS (Intel, Apple Silicon)
+- Windows (AMD64, ARM64)
 
 **Manual Installation:**
 
