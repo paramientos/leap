@@ -36,6 +36,8 @@ All in a single binary with zero dependencies!
 - 📤 **Plain-text Export/Import** - Easily backup and share configurations
 - 📁 **SSH Config Import** - Migrate from `~/.ssh/config` in one command
 
+[LeapSSH Demo Video](https://www.loom.com/share/10a64c100e804c15b54b7ca4aab0528b)
+
 ## 📦 Installation
 
 ### Quick Install (Recommended)
