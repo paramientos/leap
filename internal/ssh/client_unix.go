@@ -40,7 +40,7 @@ func setupWindowResizeHandler(fd int, session *ssh.Session) {
 	go func() {
 		for range sig {
 			nw, nh, _ := term.GetSize(fd)
-			session.WindowChange(nh, nw)
+			_ = session.WindowChange(nh, nw)
 		}
 	}()
 }

@@ -118,7 +118,7 @@ func GetPassphrase() string {
 				if err == nil {
 					masterPassword = string(decrypted)
 					// Refresh the session timeout on each use
-					os.Chtimes(sessionFile, time.Now(), time.Now())
+					_ = os.Chtimes(sessionFile, time.Now(), time.Now())
 					return masterPassword
 				} else {
 					// File exists but is not valid obfuscated data (maybe old plaintext)

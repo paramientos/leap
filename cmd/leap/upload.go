@@ -30,7 +30,7 @@ var uploadCmd = &cobra.Command{
 
 		if !ok {
 			fmt.Printf("\n❌ Connection '\033[1;36m%s\033[0m' not found.\n", name)
-			fmt.Println("\033[90mTip: Use 'leap list' to see all available connections\033[0m\n")
+			fmt.Println("\033[90mTip: Use 'leap list' to see all available connections\033[0m")
 
 			return
 		}
@@ -73,7 +73,7 @@ var uploadCmd = &cobra.Command{
 		}
 
 		fmt.Println("\n\033[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
-		fmt.Printf("\n\033[32m✓\033[0m Upload completed successfully\n\n")
+		fmt.Printf("\n\033[32m✓\033[0m Upload completed successfully\n")
 	},
 }
 
@@ -95,7 +95,7 @@ var downloadCmd = &cobra.Command{
 		conn, ok := cfg.Connections[name]
 		if !ok {
 			fmt.Printf("\n❌ Connection '\033[1;36m%s\033[0m' not found.\n", name)
-			fmt.Println("\033[90mTip: Use 'leap list' to see all available connections\033[0m\n")
+			fmt.Println("\033[90mTip: Use 'leap list' to see all available connections\033[0m")
 			return
 		}
 

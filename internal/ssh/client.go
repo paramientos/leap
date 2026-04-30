@@ -41,8 +41,16 @@ func hostKeyCallback() ssh.HostKeyCallback {
 
 	// Ensure the file exists so knownhosts.New doesn't fail.
 	if _, err := os.Stat(khPath); errors.Is(err, os.ErrNotExist) {
-		os.MkdirAll(filepath.Dir(khPath), 0700)
-		os.WriteFile(khPath, nil, 0600)
+		if err := os.MkdirAll(filepath.Dir(khPath), 0700); err != nil {
+			return func(_ string, _ net.Addr, _ ssh.PublicKey) error {
+				return fmt.Errorf("failed to create .ssh directory: %v", err)
+			}
+		}
+		if err := os.WriteFile(khPath, nil, 0600); err != nil {
+			return func(_ string, _ net.Addr, _ ssh.PublicKey) error {
+				return fmt.Errorf("failed to create known_hosts: %v", err)
+			}
+		}
 	}
 
 	checker, err := knownhosts.New(khPath)
@@ -114,14 +122,15 @@ func connectNative(conn config.Connection, record bool) error {
 	if record {
 		home, _ := os.UserHomeDir()
 		historyDir := filepath.Join(home, ".leap", "history")
-		os.MkdirAll(historyDir, 0700)
-		fileName := fmt.Sprintf("%s_%s.cast", conn.Name, time.Now().Format("20060102_150405"))
-		path := filepath.Join(historyDir, fileName)
-		f, err := os.Create(path)
-		if err == nil {
-			recordingFile = f
-			defer f.Close()
-			fmt.Printf("\n⏺️  \033[90mRecording session to %s\033[0m\n", path)
+		if err := os.MkdirAll(historyDir, 0700); err == nil {
+			fileName := fmt.Sprintf("%s_%s.cast", conn.Name, time.Now().Format("20060102_150405"))
+			path := filepath.Join(historyDir, fileName)
+			f, err := os.Create(path)
+			if err == nil {
+				recordingFile = f
+				defer f.Close()
+				fmt.Printf("\n⏺️  \033[90mRecording session to %s\033[0m\n", path)
+			}
 		}
 	}
 
@@ -168,7 +177,7 @@ func connectNative(conn config.Connection, record bool) error {
 		if err != nil {
 			return err
 		}
-		defer term.Restore(fd, oldState)
+		defer func() { _ = term.Restore(fd, oldState) }()
 
 		w, h, _ := term.GetSize(fd)
 		modes := ssh.TerminalModes{
@@ -190,15 +199,15 @@ func connectNative(conn config.Connection, record bool) error {
 	stdout, _ := session.StdoutPipe()
 	stderr, _ := session.StderrPipe()
 
-	go io.Copy(stdin, os.Stdin)
+	go func() { _, _ = io.Copy(stdin, os.Stdin) }()
 
 	var logout io.Writer = os.Stdout
 	if recordingFile != nil {
 		logout = io.MultiWriter(os.Stdout, recordingFile)
 	}
 
-	go io.Copy(logout, stdout)
-	go io.Copy(os.Stderr, stderr)
+	go func() { _, _ = io.Copy(logout, stdout) }()
+	go func() { _, _ = io.Copy(os.Stderr, stderr) }()
 
 	if err := session.Shell(); err != nil {
 		return err

@@ -28,7 +28,7 @@ var tunnelCmd = &cobra.Command{
 
 		if !ok {
 			fmt.Printf("\n❌ Connection '\033[1;36m%s\033[0m' not found.\n", name)
-			fmt.Println("\033[90mTip: Use 'leap list' to see all available connections\033[0m\n")
+			fmt.Println("\033[90mTip: Use 'leap list' to see all available connections\033[0m")
 
 			return
 		}
@@ -64,7 +64,7 @@ var tunnelCmd = &cobra.Command{
 		if err != nil {
 			fmt.Printf("\n❌ Tunnel closed: %v\n\n", err)
 		} else {
-			fmt.Println("\n\033[32m✓\033[0m Tunnel closed successfully\n")
+			fmt.Println("\n\033[32m✓\033[0m Tunnel closed successfully")
 		}
 	},
 }

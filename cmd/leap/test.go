@@ -48,12 +48,12 @@ var testCmd = &cobra.Command{
 			}
 		} else {
 			fmt.Println("\n❌ Please specify connection name(s), use --all, or --tag")
-			fmt.Println("\033[90mUsage: leap test [name] or leap test --all\033[0m\n")
+			fmt.Println("\033[90mUsage: leap test [name] or leap test --all\033[0m")
 			return
 		}
 
 		if len(connsToTest) == 0 {
-			fmt.Println("\n\033[90mNo connections to test\033[0m\n")
+			fmt.Println("\n\033[90mNo connections to test\033[0m")
 			return
 		}
 

@@ -51,7 +51,7 @@ var connectCmd = &cobra.Command{
 		}
 
 		cfg.UpdateLastUsed(name)
-		config.SaveConfig(cfg, GetPassphrase())
+		_ = config.SaveConfig(cfg, GetPassphrase())
 
 		record, _ := cmd.Flags().GetBool("record")
 

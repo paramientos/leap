@@ -64,8 +64,6 @@ func LoadConfig(passphrase string) (*Config, error) {
 			return nil, fmt.Errorf("invalid master password")
 		}
 		data = decrypted
-	} else {
-		// Migration: If file is not encrypted yet, we will encrypt it on next save
 	}
 
 	var cfg Config

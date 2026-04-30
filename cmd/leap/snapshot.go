@@ -203,7 +203,7 @@ func captureSnapshot(conn config.Connection, name string, includePackages bool) 
 	fmt.Println(" \033[32m✓\033[0m")
 
 	processCount, _ := runCommand(client, "ps aux | wc -l")
-	fmt.Sscanf(processCount, "%d", &snapshot.ProcessCount)
+	_, _ = fmt.Sscanf(processCount, "%d", &snapshot.ProcessCount)
 
 	if includePackages {
 		fmt.Print("  ⏳ Gathering installed packages (this may take a while)...")

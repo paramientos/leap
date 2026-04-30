@@ -11,8 +11,6 @@ import (
 )
 
 var (
-	laravelRed     = lipgloss.Color("#FF2D20")
-	laravelOrange  = lipgloss.Color("#FF6B35")
 	primaryGreen   = lipgloss.Color("#10B981")
 	accentCyan     = lipgloss.Color("#06B6D4")
 	darkBg         = lipgloss.Color("#1F2937")
@@ -61,12 +59,6 @@ var (
 	statusStyle = lipgloss.NewStyle().
 			Foreground(darkBg).
 			Background(primaryGreen).
-			Padding(0, 2).
-			Bold(true)
-
-	warningStyle = lipgloss.NewStyle().
-			Foreground(darkBg).
-			Background(laravelOrange).
 			Padding(0, 2).
 			Bold(true)
 
